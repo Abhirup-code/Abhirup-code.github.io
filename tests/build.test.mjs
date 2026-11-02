@@ -3,7 +3,7 @@ import { existsSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { build, esc, FORM_ENDPOINT, hasForm, render, safeUrl, validate } from "../build.mjs";
+import { build, esc, FORM_ENDPOINT, hasForm, render, renderCase, safeUrl, validate } from "../build.mjs";
 
 const content = JSON.parse(readFileSync(new URL("../content.json", import.meta.url), "utf8"));
 const copy = () => structuredClone(content);
@@ -78,10 +78,63 @@ test("a photo is optional", () => {
   assert.ok(html.includes("hero-art has-photo"));
 });
 
-test("the page blocks scripts and outside content with a Content Security Policy", () => {
+test("scripts can only come from this site, and none are inline", () => {
+  const pages = [render(content), ...content.projects.map((p) => renderCase(content, p))];
+  for (const html of pages) {
+    assert.match(html, /<meta http-equiv="Content-Security-Policy" content="[^"]*script-src 'self'/);
+    const scripts = html.match(/<script[^>]*>/g) ?? [];
+    for (const tag of scripts) {
+      assert.match(tag, /^<script (src="(\.\.\/)?assets\/(theme|app)\.js"( defer)?|type="application\/ld\+json")>$/, tag);
+    }
+    // style-src has no 'unsafe-inline', so an inline style attribute would be silently ignored.
+    assert.ok(!/\sstyle="/.test(html), "no inline style attributes");
+  }
+});
+
+test("the theme is set before the stylesheet loads, so the page never flashes the wrong theme", () => {
   const html = render(content);
-  assert.match(html, /<meta http-equiv="Content-Security-Policy" content="[^"]*script-src 'none'/);
-  assert.ok(!/<script(?![^>]*application\/ld\+json)/.test(html), "no executable scripts");
+  assert.ok(html.indexOf("assets/theme.js") < html.indexOf("assets/styles.css"));
+  assert.match(html, /<button class="theme-toggle magnetic" type="button" aria-label="Switch to dark mode" hidden>/);
+});
+
+test("each project tile opens a pop-up, and links to a full case study page without JavaScript", () => {
+  const html = render(content);
+  for (const p of content.projects) {
+    const slug = p.caseStudy.slug;
+    assert.ok(html.includes(`href="work/${slug}.html" data-dialog="dlg-${slug}"`), slug);
+    assert.ok(html.includes(`<dialog class="project-dialog" id="dlg-${slug}" aria-labelledby="dlg-${slug}-title">`), slug);
+    const page = renderCase(content, p);
+    assert.ok(page.includes(`<h1>${esc(p.title)}</h1>`));
+    for (const item of [...p.caseStudy.built, ...p.caseStudy.results]) assert.ok(page.includes(esc(item)), item.slice(0, 30));
+    assert.ok(page.includes('href="../assets/styles.css"'));
+  }
+});
+
+test("a case study needs every part and a safe slug", () => {
+  const bad = copy();
+  bad.projects[0].caseStudy.slug = "../evil";
+  bad.projects[1].caseStudy.results = [];
+  const problems = validate(bad);
+  assert.ok(problems.includes("projects[0].caseStudy.slug must be lowercase letters, numbers, and dashes"));
+  assert.ok(problems.includes("projects[1].caseStudy needs problem, built, results, and tech"));
+});
+
+test("the role line rotates, with one plain sentence for screen readers", () => {
+  const html = render(content);
+  assert.ok(html.includes(`<span class="sr-only">Open to roles in ${content.roles.join(", ")}</span>`));
+  assert.ok(html.includes(`rotator rotator-${content.roles.length}`));
+  const one = copy();
+  one.roles = ["DevOps"];
+  assert.ok(render(one).includes(`<p class="role">${esc(one.role)}</p>`));
+});
+
+test("carousel controls stay hidden until JavaScript turns them on", () => {
+  assert.match(render(content), /<div class="carousel-controls" hidden>/);
+});
+
+test("Wipro jobs say Bengaluru, India", () => {
+  const html = render(content);
+  assert.equal(html.split("Bengaluru, India").length - 1, 2);
 });
 
 test("outside links open in a new tab without giving it access to this page", () => {
@@ -93,7 +146,7 @@ test("outside links open in a new tab without giving it access to this page", ()
 
 test("the build writes the page, assets, domain, and 404 page", () => {
   const out = build(join(mkdtempSync(join(tmpdir(), "site-")), "_site"));
-  for (const file of ["index.html", "404.html", "thanks.html", "CNAME", "robots.txt", "assets/styles.css", "assets/favicon.svg", content.links.resume]) {
+  for (const file of ["index.html", "404.html", "thanks.html", "work/honest-fit.html", "assets/app.js", "assets/theme.js", "CNAME", "robots.txt", "assets/styles.css", "assets/favicon.svg", content.links.resume]) {
     assert.ok(existsSync(join(out, file)), file);
   }
   assert.equal(readFileSync(join(out, "CNAME"), "utf8").trim(), "abhirupkhan.me");
@@ -160,7 +213,7 @@ test("the contact form appears only once a Web3Forms key is set", () => {
   const off = copy();
   off.contactForm.accessKey = "";
   assert.ok(!hasForm(off));
-  assert.ok(!render(off).includes("<form"));
+  assert.ok(!render(off).includes('<form class="contact-form"'));
   assert.match(render(off), /form-action 'none'/);
   const on = copy();
   on.contactForm.accessKey = KEY;

@@ -52,6 +52,15 @@ export function validate(c) {
     need(text(p.title) && text(p.description) && text(p.url), `projects[${i}] needs title, description, and url`);
     need(STYLES.includes(p.style), `projects[${i}].style must be one of ${STYLES.join(", ")}`);
   }
+  for (const [i, p] of (c?.projects ?? []).entries()) {
+    const cs = p.caseStudy;
+    if (cs) {
+      need(/^[a-z0-9-]+$/.test(cs.slug ?? ""), `projects[${i}].caseStudy.slug must be lowercase letters, numbers, and dashes`);
+      need(text(cs.problem) && [cs.built, cs.results, cs.tech].every((l) => Array.isArray(l) && l.length && l.every(text)),
+        `projects[${i}].caseStudy needs problem, built, results, and tech`);
+    }
+  }
+  need((c?.roles ?? []).every(text), "roles must be a list of text");
   for (const [i, p] of (c?.moreProjects ?? []).entries()) {
     need(text(p.title) && text(p.description) && text(p.url), `moreProjects[${i}] needs title, description, and url`);
   }
@@ -91,19 +100,109 @@ export function validate(c) {
 const isExternal = (url) => url.startsWith("https://");
 const linkAttrs = (url) => (isExternal(url) ? ' target="_blank" rel="noopener noreferrer"' : "");
 
+const casePath = (p) => `work/${p.caseStudy.slug}.html`;
+
 function projectTile(p, i) {
   const n = String(i + 1).padStart(2, "0");
   const code = p.code
     ? `<a class="tile-code" href="${esc(safeUrl(p.code))}"${linkAttrs(p.code)}>Code</a>`
     : "";
+  const target = p.caseStudy
+    ? `href="${casePath(p)}" data-dialog="dlg-${esc(p.caseStudy.slug)}"`
+    : `href="${esc(safeUrl(p.url))}"${linkAttrs(p.url)}`;
   return `
       <article class="tile tile-${esc(p.style)}">
-        <a class="tile-link" href="${esc(safeUrl(p.url))}"${linkAttrs(p.url)}>
+        <a class="tile-link" ${target}>
           <span class="tile-top"><span class="kicker">${n} · ${esc(p.kicker ?? "")}</span><span class="arrow" aria-hidden="true">↗</span></span>
           <span class="tile-body"><strong class="tile-title">${esc(p.title)}</strong><span class="tile-desc">${esc(p.description)}</span></span>
         </a>${code}
       </article>`;
 }
+
+const list = (items) => `<ul>${items.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`;
+const chips = (items) => `<ul class="chips">${items.map((x) => `<li class="chip chip-outline">${esc(x)}</li>`).join("")}</ul>`;
+
+/** Links for a project: the live demo when there is one, and the code. */
+function projectLinks(p) {
+  const out = [];
+  if (p.code) out.push(`<a class="btn btn-solid magnetic" href="${esc(safeUrl(p.url))}"${linkAttrs(p.url)}>Live demo ↗</a>`);
+  const code = p.code ?? p.url;
+  out.push(`<a class="btn magnetic" href="${esc(safeUrl(code))}"${linkAttrs(code)}>Code on GitHub ↗</a>`);
+  return out.join("\n          ");
+}
+
+/** A pop-up with the short version of a case study. JavaScript opens it; without it the tile links to the page. */
+function projectDialog(p) {
+  const cs = p.caseStudy;
+  const id = `dlg-${esc(cs.slug)}`;
+  return `
+  <dialog class="project-dialog" id="${id}" aria-labelledby="${id}-title">
+    <form method="dialog" class="dialog-close-form"><button class="dialog-close" aria-label="Close">×</button></form>
+    <p class="eyebrow">${esc(p.kicker ?? "Project")}</p>
+    <h2 id="${id}-title">${esc(p.title)}</h2>
+    <p class="dialog-problem">${esc(cs.problem)}</p>
+    <h3>What I built</h3>
+    ${list(cs.built.slice(0, 4))}
+    <h3>Results</h3>
+    ${list(cs.results)}
+    ${chips(cs.tech)}
+    <div class="dialog-actions">
+      ${projectLinks(p)}
+      <a class="btn magnetic" href="${casePath(p)}">Full case study →</a>
+    </div>
+  </dialog>`;
+}
+
+/** A full case study page for one project, at work/<slug>.html. */
+export function renderCase(c, p) {
+  const cs = p.caseStudy;
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${esc(p.title)} · Case study · ${esc(c.name)}</title>
+<meta name="description" content="${esc(cs.problem)}">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; script-src 'self'; base-uri 'none'; form-action 'none'">
+${c.url ? `<link rel="canonical" href="${esc(safeUrl(c.url).replace(/\/?$/, "/"))}${casePath(p)}">` : ""}
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<script src="../assets/theme.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&amp;family=Inter:wght@400;500;600;700&amp;display=swap">
+<link rel="stylesheet" href="../assets/styles.css">
+<script src="../assets/app.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav wrap">
+  <a class="brand" href="../">${esc(c.shortName ?? c.name)}</a>
+  <nav aria-label="Site">
+    <a href="../#work">All work</a>
+    ${themeToggle}
+    <a class="pill magnetic" href="../${esc(safeUrl(c.links.resume))}">Resume ↗</a>
+  </nav>
+</header>
+<main id="main" class="case wrap">
+  <p class="eyebrow">Case study · ${esc(p.kicker ?? "")}</p>
+  <h1>${esc(p.title)}</h1>
+  <p class="case-lede">${esc(p.description)}</p>
+  <div class="case-actions">${projectLinks(p)}</div>
+  <section class="case-section reveal"><h2>The problem</h2><p>${esc(cs.problem)}</p></section>
+  <section class="case-section reveal"><h2>What I built</h2>${list(cs.built)}</section>
+  <section class="case-section reveal"><h2>Results and quality</h2>${list(cs.results)}</section>
+  <section class="case-section reveal"><h2>Tech</h2>${chips(cs.tech)}</section>
+  <p class="case-back"><a class="btn btn-solid magnetic" href="../#work">← Back to all work</a></p>
+</main>
+</body>
+</html>
+`;
+}
+
+const themeToggle = `<button class="theme-toggle magnetic" type="button" aria-label="Switch to dark mode" hidden>
+      <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"></path></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+    </button>`;
 
 function moreCard(p) {
   return `
@@ -148,7 +247,7 @@ function contactForm(c) {
       <div class="field"><label for="f-name">Your name</label><input id="f-name" name="name" type="text" required maxlength="100" autocomplete="name"></div>
       <div class="field"><label for="f-email">Your email</label><input id="f-email" name="email" type="email" required maxlength="200" autocomplete="email"></div>
       <div class="field"><label for="f-message">Message</label><textarea id="f-message" name="message" required minlength="10" maxlength="5000" rows="5"></textarea></div>
-      <button type="submit">Send message ↗</button>
+      <button type="submit" class="magnetic">Send message ↗</button>
       <p class="form-note">Messages go straight to my inbox through Web3Forms. Nothing is stored on this site.</p>
     </form>`;
 }
@@ -162,6 +261,13 @@ function job(e, i) {
         <p class="job-org">${esc(e.org)}${e.place ? ` · ${esc(e.place)}` : ""}</p>
         <ul>${e.points.map((pt) => `<li>${esc(pt)}</li>`).join("")}</ul>
       </li>`;
+}
+
+function roleLine(c) {
+  const roles = c.roles ?? [];
+  if (roles.length < 2 || roles.length > 5) return `<p class="role">${esc(c.role)}</p>`;
+  // Screen readers get one plain sentence; the moving words are hidden from them.
+  return `<p class="role"><span class="sr-only">Open to roles in ${esc(roles.join(", "))}</span><span class="role-static" aria-hidden="true">${esc(c.role)}</span><span class="role-anim" aria-hidden="true">Open to roles in <span class="rotator rotator-${Math.min(roles.length, 5)}"><span class="rotator-track">${[...roles, roles[0]].map((r) => `<span>${esc(r)}</span>`).join("")}</span></span></span></p>`;
 }
 
 export function render(c) {
@@ -192,7 +298,7 @@ export function render(c) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(c.name)} · ${esc(c.role)}</title>
 <meta name="description" content="${esc(c.description ?? c.intro)}">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; script-src 'none'; base-uri 'none'; form-action ${hasForm(c) ? `'self' ${FORM_ENDPOINT_ORIGIN}` : "'none'"}">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; script-src 'self'; base-uri 'none'; form-action ${hasForm(c) ? `'self' ${FORM_ENDPOINT_ORIGIN}` : "'none'"}">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 ${c.url ? `<link rel="canonical" href="${esc(safeUrl(c.url))}">` : ""}
 <meta property="og:title" content="${esc(c.name)} · ${esc(c.role)}">
@@ -200,10 +306,12 @@ ${c.url ? `<link rel="canonical" href="${esc(safeUrl(c.url))}">` : ""}
 <meta property="og:type" content="profile">
 ${c.url ? `<meta property="og:url" content="${esc(safeUrl(c.url))}">` : ""}
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<script src="assets/theme.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&amp;family=Inter:wght@400;500;600;700&amp;display=swap">
 <link rel="stylesheet" href="assets/styles.css">
+<script src="assets/app.js" defer></script>
 <script type="application/ld+json">${JSON.stringify(person).replaceAll("<", "\\u003c")}</script>
 </head>
 <body>
@@ -214,7 +322,8 @@ ${c.url ? `<meta property="og:url" content="${esc(safeUrl(c.url))}">` : ""}
     <a href="#work">Work</a>
     <a href="#experience">Experience</a>
     <a class="nav-contact" href="#contact">Contact</a>
-    <a class="pill" href="${esc(safeUrl(L.resume))}">Resume ↗</a>
+    ${themeToggle}
+    <a class="pill magnetic" href="${esc(safeUrl(L.resume))}">Resume ↗</a>
   </nav>
 </header>
 <div class="ticker" aria-hidden="true"><div class="ticker-track"><span>${ticker}</span><span>${ticker}</span></div></div>
@@ -222,7 +331,7 @@ ${c.url ? `<meta property="og:url" content="${esc(safeUrl(c.url))}">` : ""}
   <section class="hero wrap" id="top">
     <h1><span class="name-first">${esc(first)}</span> <span class="name-last">${esc(rest.join(" "))}.</span></h1>
     <p class="intro">${esc(c.intro)}</p>
-    <p class="role">${esc(c.role)}</p>
+    ${roleLine(c)}
     <div class="hero-art${photo ? " has-photo" : ""}">${photo}
       <svg class="badge" viewBox="0 0 168 168" role="img" aria-label="${esc(c.badge.replaceAll("·", ",").replace(/[,\s]+$/, ""))}">
         <defs><path id="badge-circle" d="M84,84 m-60,0 a60,60 0 1,1 120,0 a60,60 0 1,1 -120,0"></path></defs>
@@ -239,6 +348,7 @@ ${c.url ? `<meta property="og:url" content="${esc(safeUrl(c.url))}">` : ""}
       ${stat}
     </div>
   </section>
+${c.projects.filter((p) => p.caseStudy).map(projectDialog).join("")}
 
 ${(c.moreProjects ?? []).length ? `  <section class="more wrap" aria-labelledby="more-heading">
     <h2 id="more-heading" class="eyebrow">More projects</h2>
@@ -262,7 +372,15 @@ ${(c.recommendations ?? []).length ? `  <section class="recs wrap" id="recommend
       <h2 id="recs-heading">What people <em>say.</em></h2>
       ${L.linkedin ? `<p><a href="${esc(safeUrl(L.linkedin))}"${linkAttrs(L.linkedin)}>See them on LinkedIn ↗</a></p>` : ""}
     </div>
-    <div class="rec-list">${c.recommendations.map(recommendation).join("")}
+    <div class="rec-carousel" data-carousel>
+      <div class="rec-list">${c.recommendations.map(recommendation).join("")}
+      </div>
+      <div class="carousel-controls" hidden>
+        <button type="button" class="carousel-prev magnetic" aria-label="Previous recommendation">←</button>
+        <p class="carousel-status" aria-live="polite"></p>
+        <button type="button" class="carousel-pause magnetic" aria-label="Pause automatic slides">Pause</button>
+        <button type="button" class="carousel-next magnetic" aria-label="Next recommendation">→</button>
+      </div>
     </div>
   </section>
 
@@ -296,10 +414,10 @@ ${(c.awards ?? []).length ? `
     <h2>${esc(c.contact?.heading ?? "Let's talk.")}</h2>
     <p>${esc(c.contact?.text ?? c.location ?? "")}</p>
     <ul class="contact-links">
-      <li><a class="solid" href="${esc(safeUrl(`mailto:${L.email}`))}">${esc(L.email)}</a></li>
-      ${L.linkedin ? `<li><a href="${esc(safeUrl(L.linkedin))}"${linkAttrs(L.linkedin)}>LinkedIn ↗</a></li>` : ""}
-      ${L.github ? `<li><a href="${esc(safeUrl(L.github))}"${linkAttrs(L.github)}>GitHub ↗</a></li>` : ""}
-      ${L.resume ? `<li><a href="${esc(safeUrl(L.resume))}">Resume ↗</a></li>` : ""}
+      <li><a class="solid magnetic" href="${esc(safeUrl(`mailto:${L.email}`))}">${esc(L.email)}</a></li>
+      ${L.linkedin ? `<li><a class="magnetic" href="${esc(safeUrl(L.linkedin))}"${linkAttrs(L.linkedin)}>LinkedIn ↗</a></li>` : ""}
+      ${L.github ? `<li><a class="magnetic" href="${esc(safeUrl(L.github))}"${linkAttrs(L.github)}>GitHub ↗</a></li>` : ""}
+      ${L.resume ? `<li><a class="magnetic" href="${esc(safeUrl(L.resume))}">Resume ↗</a></li>` : ""}
     </ul>
     ${hasForm(c) ? contactForm(c) : ""}
     <p class="fine">© ${new Date().getFullYear()} ${esc(c.name)}</p>
@@ -316,6 +434,10 @@ export function build(outDir = join(ROOT, "_site")) {
   rmSync(outDir, { recursive: true, force: true });
   mkdirSync(outDir, { recursive: true });
   writeFileSync(join(outDir, "index.html"), html);
+  mkdirSync(join(outDir, "work"), { recursive: true });
+  for (const p of content.projects.filter((x) => x.caseStudy)) {
+    writeFileSync(join(outDir, casePath(p)), renderCase(content, p));
+  }
   cpSync(join(ROOT, "assets"), join(outDir, "assets"), { recursive: true });
   for (const file of ["404.html", "thanks.html", "CNAME", "robots.txt"]) {
     if (existsSync(join(ROOT, file))) copyFileSync(join(ROOT, file), join(outDir, file));
