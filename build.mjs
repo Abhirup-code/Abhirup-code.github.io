@@ -8,6 +8,15 @@ import { fileURLToPath } from "node:url";
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const STYLES = ["feature", "accent", "lime", "blue", "outline"];
 
+export const FORM_ENDPOINT = "https://api.web3forms.com/submit";
+const FORM_ENDPOINT_ORIGIN = "https://api.web3forms.com";
+const ACCESS_KEY = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** The contact form shows only once a Web3Forms access key is set in content.json. */
+export function hasForm(c) {
+  return ACCESS_KEY.test(c?.contactForm?.accessKey ?? "");
+}
+
 export function esc(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -60,6 +69,8 @@ export function validate(c) {
   for (const [i, s] of (c?.skills ?? []).entries()) {
     need(STYLES.includes(s.style) && s.style !== "feature", `skills[${i}].style must be accent, lime, blue, or outline`);
   }
+  const key = c?.contactForm?.accessKey ?? "";
+  need(key === "" || ACCESS_KEY.test(key), "contactForm.accessKey must be the key Web3Forms emailed you (it looks like 8-4-4-4-12 letters and numbers)");
   // House style: no em dashes anywhere in the content.
   const all = JSON.stringify(c ?? {});
   need(!all.includes("\u2014"), "content uses an em dash; use a comma, colon, or 'to' instead");
@@ -123,6 +134,23 @@ function recommendation(r) {
       </figure>`;
 }
 
+function contactForm(c) {
+  const base = c.url ? safeUrl(c.url).replace(/\/?$/, "/") : "";
+  return `<form class="contact-form" action="${FORM_ENDPOINT}" method="POST" aria-labelledby="form-heading">
+      <h3 id="form-heading">Send me a message</h3>
+      <input type="hidden" name="access_key" value="${esc(c.contactForm.accessKey)}">
+      <input type="hidden" name="subject" value="${esc(c.contactForm.subject ?? `New message from ${c.name}'s site`)}">
+      <input type="hidden" name="from_name" value="${esc(c.name)} portfolio">
+      ${base ? `<input type="hidden" name="redirect" value="${esc(base)}thanks.html">` : ""}
+      <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div class="field"><label for="f-name">Your name</label><input id="f-name" name="name" type="text" required maxlength="100" autocomplete="name"></div>
+      <div class="field"><label for="f-email">Your email</label><input id="f-email" name="email" type="email" required maxlength="200" autocomplete="email"></div>
+      <div class="field"><label for="f-message">Message</label><textarea id="f-message" name="message" required minlength="10" maxlength="5000" rows="5"></textarea></div>
+      <button type="submit">Send message ↗</button>
+      <p class="form-note">Messages go straight to my inbox through Web3Forms. Nothing is stored on this site.</p>
+    </form>`;
+}
+
 function job(e, i) {
   return `
       <li class="job reveal${i === 0 ? " job-current" : ""}">
@@ -162,7 +190,7 @@ export function render(c) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(c.name)} · ${esc(c.role)}</title>
 <meta name="description" content="${esc(c.description ?? c.intro)}">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; script-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; script-src 'none'; base-uri 'none'; form-action ${hasForm(c) ? FORM_ENDPOINT_ORIGIN : "'none'"}">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 ${c.url ? `<link rel="canonical" href="${esc(safeUrl(c.url))}">` : ""}
 <meta property="og:title" content="${esc(c.name)} · ${esc(c.role)}">
@@ -183,6 +211,7 @@ ${c.url ? `<meta property="og:url" content="${esc(safeUrl(c.url))}">` : ""}
   <nav aria-label="Sections">
     <a href="#work">Work</a>
     <a href="#experience">Experience</a>
+    <a class="nav-contact" href="#contact">Contact</a>
     <a class="pill" href="${esc(safeUrl(L.resume))}">Resume ↗</a>
   </nav>
 </header>
@@ -270,6 +299,7 @@ ${(c.awards ?? []).length ? `
       ${L.github ? `<li><a href="${esc(safeUrl(L.github))}"${linkAttrs(L.github)}>GitHub ↗</a></li>` : ""}
       ${L.resume ? `<li><a href="${esc(safeUrl(L.resume))}">Resume ↗</a></li>` : ""}
     </ul>
+    ${hasForm(c) ? contactForm(c) : ""}
     <p class="fine">© ${new Date().getFullYear()} ${esc(c.name)}</p>
   </div>
 </footer>
@@ -285,7 +315,7 @@ export function build(outDir = join(ROOT, "_site")) {
   mkdirSync(outDir, { recursive: true });
   writeFileSync(join(outDir, "index.html"), html);
   cpSync(join(ROOT, "assets"), join(outDir, "assets"), { recursive: true });
-  for (const file of ["404.html", "CNAME", "robots.txt"]) {
+  for (const file of ["404.html", "thanks.html", "CNAME", "robots.txt"]) {
     if (existsSync(join(ROOT, file))) copyFileSync(join(ROOT, file), join(outDir, file));
   }
   for (const link of [content.links.resume, content.photo].filter(Boolean)) {

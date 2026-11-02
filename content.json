@@ -271,5 +271,10 @@
   "contact": {
     "heading": "Let's talk.",
     "text": "Looking for IT support, QA, and DevOps opportunities. Chicago, open to relocation."
+  },
+  "contactForm": {
+    "provider": "web3forms",
+    "accessKey": "",
+    "subject": "New message from abhirupkhan.me"
   }
 }

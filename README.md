@@ -12,6 +12,7 @@ Everything on the page comes from [`content.json`](content.json): projects, jobs
 - **New project:** add an entry to `projects`. `style` is one of `feature`, `accent`, `lime`, `blue`, or `outline`; `code` is optional, for a project whose main link is a live demo.
 - **Photo:** put the image in `assets/` and set `"photo": "assets/photo.jpg"`.
 - **Resume:** replace `assets/Abhirup_Khan_Resume.pdf`.
+- **Contact form:** get a free access key at [web3forms.com](https://web3forms.com) (enter your email, and the key arrives by email), then paste it into `contactForm.accessKey`. The form appears once the key is set, and every message goes to that email. The key is meant to be public; it can only send mail to you.
 
 If something in `content.json` is wrong (a missing field, a bad link, an em dash), the build stops with a message saying what to fix, and the live site stays as it was.
 
@@ -32,7 +33,8 @@ Then open http://localhost:8000.
 | | |
 |---|---|
 | Build | `build.mjs` turns `content.json` into one static HTML page. No framework, no dependencies |
-| Safety | Every value is HTML-escaped, links must be https, mailto, or a file in this repo, and a Content-Security-Policy blocks all scripts |
+| Safety | Every value is HTML-escaped, links must be https, mailto, or a file in this repo, a Content-Security-Policy blocks all scripts, and forms can only post to Web3Forms |
+| Contact form | Plain HTML, no JavaScript: name, email, and message post to Web3Forms, which emails them to me and sends the visitor to a thank-you page. A hidden field catches spam bots |
 | Motion | A skills ticker, a spinning badge, hover lift on projects, and sections that rise into place on scroll, all in CSS; all motion stops for people who turn on reduced motion |
 | Accessibility | axe-core finds no WCAG 2.1 AA issues at desktop and phone sizes; skip link, focus outlines, and real headings and lists |
 | Tests | `node --test` checks the content, escaping, allowed links, page order, and build output |

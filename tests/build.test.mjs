@@ -3,7 +3,7 @@ import { existsSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { build, esc, render, safeUrl, validate } from "../build.mjs";
+import { build, esc, FORM_ENDPOINT, hasForm, render, safeUrl, validate } from "../build.mjs";
 
 const content = JSON.parse(readFileSync(new URL("../content.json", import.meta.url), "utf8"));
 const copy = () => structuredClone(content);
@@ -93,7 +93,7 @@ test("outside links open in a new tab without giving it access to this page", ()
 
 test("the build writes the page, assets, domain, and 404 page", () => {
   const out = build(join(mkdtempSync(join(tmpdir(), "site-")), "_site"));
-  for (const file of ["index.html", "404.html", "CNAME", "robots.txt", "assets/styles.css", "assets/favicon.svg", content.links.resume]) {
+  for (const file of ["index.html", "404.html", "thanks.html", "CNAME", "robots.txt", "assets/styles.css", "assets/favicon.svg", content.links.resume]) {
     assert.ok(existsSync(join(out, file)), file);
   }
   assert.equal(readFileSync(join(out, "CNAME"), "utf8").trim(), "abhirupkhan.me");
@@ -152,4 +152,42 @@ test("a reworded pull quote is rejected", () => {
   const none = copy();
   delete none.recommendations;
   assert.ok(!render(none).includes("What people"));
+});
+
+const KEY = "12345678-abcd-4ef0-9876-0123456789ab";
+
+test("the contact form appears only once a Web3Forms key is set", () => {
+  const off = copy();
+  off.contactForm.accessKey = "";
+  assert.ok(!hasForm(off));
+  assert.ok(!render(off).includes("<form"));
+  assert.match(render(off), /form-action 'none'/);
+  const on = copy();
+  on.contactForm.accessKey = KEY;
+  const html = render(on);
+  assert.ok(html.includes(`<form class="contact-form" action="${FORM_ENDPOINT}" method="POST"`));
+  assert.ok(html.includes(`name="access_key" value="${KEY}"`));
+  assert.ok(html.includes('name="redirect" value="https://abhirupkhan.me/thanks.html"'));
+  assert.match(html, /form-action https:\/\/api\.web3forms\.com"/);
+});
+
+test("the form has labelled, required fields and a hidden spam trap", () => {
+  const on = copy();
+  on.contactForm.accessKey = KEY;
+  const html = render(on);
+  for (const [id, label] of [["f-name", "Your name"], ["f-email", "Your email"], ["f-message", "Message"]]) {
+    assert.ok(html.includes(`<label for="${id}">${label}</label>`), label);
+    assert.match(html, new RegExp(`id="${id}"[^>]*required`), id);
+  }
+  assert.match(html, /<input type="checkbox" name="botcheck" class="hp" tabindex="-1"/);
+});
+
+test("a malformed access key is rejected", () => {
+  const bad = copy();
+  bad.contactForm.accessKey = '"><script>alert(1)</script>';
+  assert.ok(validate(bad).some((p) => p.startsWith("contactForm.accessKey must be")));
+});
+
+test("the header links to the contact section", () => {
+  assert.ok(render(content).includes('<a class="nav-contact" href="#contact">Contact</a>'));
 });
