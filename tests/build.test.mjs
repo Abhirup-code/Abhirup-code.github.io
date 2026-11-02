@@ -128,6 +128,9 @@ test("awards are listed in order, are optional, and need a title and org", () =>
   bad.awards[0] = { title: "Award" };
   assert.ok(validate(bad).includes("awards[0] needs title and org"));
   const dated = copy();
-  dated.awards[0].year = "2023";
-  assert.ok(render(dated).includes("Wipro · 2023"));
+  dated.awards[1].year = "2023";
+  assert.ok(render(dated).includes(`${esc(dated.awards[1].org)} · 2023`));
+  const undated = copy();
+  delete undated.awards[1].year;
+  assert.ok(render(undated).includes(`<strong>${esc(undated.awards[1].title)}</strong><span>${esc(undated.awards[1].org)}</span>`));
 });

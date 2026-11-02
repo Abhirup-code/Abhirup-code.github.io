@@ -200,20 +200,39 @@
   ],
   "awards": [
     {
+      "title": "Upsilon Pi Epsilon",
+      "org": "Computing honor society, Illinois Tech",
+      "year": "Jun 2026"
+    },
+    {
+      "title": "Round of Applause",
+      "org": "Wipro",
+      "year": "Apr 2025"
+    },
+    {
+      "title": "Habit Flagbearer: Always Communicating",
+      "org": "Wipro",
+      "year": "Mar 2025"
+    },
+    {
       "title": "Building Trust Award",
-      "org": "Wipro"
+      "org": "Wipro",
+      "year": "Jan 2025"
     },
     {
       "title": "Victory League Award",
-      "org": "Wipro"
+      "org": "Wipro",
+      "year": "Nov 2024"
     },
     {
-      "title": "Upsilon Pi Epsilon",
-      "org": "Honor society for computing and information disciplines, Illinois Tech"
+      "title": "Best Individual in Delivery and Operations, Middle East",
+      "org": "Wipro, Qatar Airways account",
+      "year": "Jun 2024"
     },
     {
-      "title": "Elected Graduate Senator",
-      "org": "Student Government Association, Illinois Tech"
+      "title": "Inspiring Performance",
+      "org": "Wipro",
+      "year": "Apr 2023"
     }
   ],
   "contact": {
