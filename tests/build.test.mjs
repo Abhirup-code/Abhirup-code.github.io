@@ -134,3 +134,22 @@ test("awards are listed in order, are optional, and need a title and org", () =>
   delete undated.awards[1].year;
   assert.ok(render(undated).includes(`<strong>${esc(undated.awards[1].title)}</strong><span>${esc(undated.awards[1].org)}</span>`));
 });
+
+test("recommendations show a word-for-word pull quote, the person, and the full text", () => {
+  const html = render(content);
+  for (const r of content.recommendations) {
+    assert.ok(html.includes(esc(r.quote)), r.name);
+    assert.ok(html.includes(esc(r.name)), r.name);
+    for (const para of r.text) assert.ok(html.includes(`<p>${esc(para)}</p>`), para.slice(0, 40));
+  }
+  assert.equal(html.split("<details>").length - 1, content.recommendations.length);
+});
+
+test("a reworded pull quote is rejected", () => {
+  const c = copy();
+  c.recommendations[0].quote = "Abhirup is the best engineer I have ever worked with.";
+  assert.ok(validate(c).includes("recommendations[0].quote is not word for word from its text"));
+  const none = copy();
+  delete none.recommendations;
+  assert.ok(!render(none).includes("What people"));
+});

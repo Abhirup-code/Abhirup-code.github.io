@@ -44,6 +44,12 @@ export function validate(c) {
   for (const [i, p] of (c?.moreProjects ?? []).entries()) {
     need(text(p.title) && text(p.description) && text(p.url), `moreProjects[${i}] needs title, description, and url`);
   }
+  for (const [i, r] of (c?.recommendations ?? []).entries()) {
+    const ok = text(r.name) && text(r.quote) && Array.isArray(r.text) && r.text.every(text);
+    need(ok, `recommendations[${i}] needs name, quote, and text (a list of paragraphs)`);
+    // The pull quote must be copied word for word from the recommendation, never reworded.
+    if (ok) need(r.text.some((para) => para.includes(r.quote)), `recommendations[${i}].quote is not word for word from its text`);
+  }
   for (const [i, a] of (c?.awards ?? []).entries()) {
     need(text(a.title) && text(a.org), `awards[${i}] needs title and org`);
   }
@@ -95,6 +101,26 @@ function moreCard(p) {
           ${p.tech ? `<span class="more-tech">${esc(p.tech)}</span>` : ""}
         </a>
       </li>`;
+}
+
+function initials(name) {
+  return name.split(",")[0].trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+}
+
+function recommendation(r) {
+  return `
+      <figure class="rec reveal">
+        <span class="rec-mark" aria-hidden="true">“</span>
+        <blockquote><p>${esc(r.quote)}</p></blockquote>
+        <figcaption>
+          <span class="rec-avatar" aria-hidden="true">${esc(initials(r.name))}</span>
+          <span><strong>${esc(r.name)}</strong><span>${esc(r.role ?? "")}</span><span class="rec-meta">${esc([r.relation, r.date].filter(Boolean).join(" · "))}</span></span>
+        </figcaption>
+        <details>
+          <summary>Read the full recommendation</summary>
+          ${r.text.map((para) => `<p>${esc(para)}</p>`).join("\n          ")}
+        </details>
+      </figure>`;
 }
 
 function job(e, i) {
@@ -199,7 +225,17 @@ ${(c.moreProjects ?? []).length ? `  <section class="more wrap" aria-labelledby=
     </ol>
   </section>
 
-  <section class="about wrap" id="about" aria-label="Education and skills">
+${(c.recommendations ?? []).length ? `  <section class="recs wrap" id="recommendations" aria-labelledby="recs-heading">
+    <div class="section-head">
+      <span class="eyebrow">Recommendations</span>
+      <h2 id="recs-heading">What people <em>say.</em></h2>
+      ${L.linkedin ? `<p><a href="${esc(safeUrl(L.linkedin))}"${linkAttrs(L.linkedin)}>See them on LinkedIn ↗</a></p>` : ""}
+    </div>
+    <div class="rec-list">${c.recommendations.map(recommendation).join("")}
+    </div>
+  </section>
+
+` : ""}  <section class="about wrap" id="about" aria-label="Education and skills">
     <div class="card card-dark reveal">
       <h2 class="eyebrow">Education</h2>
       ${(c.education ?? []).map((e) => `<div class="school"><strong>${esc(e.school)}</strong><span>${esc(e.degree)}</span>${e.details ? `<span>${esc(e.details)}</span>` : ""}</div>`).join("\n      ")}

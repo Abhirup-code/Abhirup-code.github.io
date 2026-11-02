@@ -144,6 +144,37 @@
       ]
     }
   ],
+  "recommendations": [
+    {
+      "name": "Adon Davis",
+      "role": "CTO, SupplyBistro",
+      "relation": "Managed me directly",
+      "date": "Aug 2026",
+      "quote": "He was comfortable taking on more complex functional testing than many of his peers and brought a level of patience and detail that was extremely valuable to the engineering team.",
+      "text": [
+        "I had the opportunity to work closely with Abhirup Khan during his summer internship at SupplyBistro, where he served as a DevSecOps Intern and worked directly with me as CTO.",
+        "Abhirup contributed across build and release management, functional testing, test automation, database operations, AWS and GitHub secrets management, and DevSecOps documentation. He also helped move code through our development lifecycle from DEV to QA, staging, and ultimately production.",
+        "One of Abhirup’s strongest differentiators was his testing background. He was comfortable taking on more complex functional testing than many of his peers and brought a level of patience and detail that was extremely valuable to the engineering team. He also began work on automated testing and helped establish foundations that the team can continue to build on.",
+        "What I appreciated most about Abhirup was his persistence. When something was difficult or did not work immediately, he kept working the problem, sought help appropriately when needed, and focused on getting to a result.",
+        "He was also a dependable teammate. I frequently called on him to help newer DevSecOps interns, and he took initiative to document and even record knowledge-transfer sessions so others could continue the work effectively.",
+        "I would recommend Abhirup for junior DevSecOps, QA automation, release engineering, or related engineering roles where he can continue building on a solid technical foundation."
+      ]
+    },
+    {
+      "name": "Brian Vanderjack, PMP, CSM, MBA",
+      "role": "Senior IT Project Manager",
+      "relation": "Taught my graduate IT Project Management course at Illinois Tech",
+      "date": "Jul 2026",
+      "quote": "That kind of practical perspective is rare in a classroom, and it made his contributions valuable not only to his own learning but to the rest of the class as well.",
+      "text": [
+        "I taught Abhirup Khan in my graduate IT Project Management course at Illinois Institute of Technology, formerly known as IIT. Illinois Tech is recognized as being among the top 100 universities in the United States.",
+        "What struck me early on was that he wasn't approaching the material like a student trying to memorize facts to pass exams. He had already spent years as a QA Engineer working on enterprise systems and later moved into a DevSecOps role. As we discussed project risk, scope, and process improvement, he could immediately connect the concepts to situations he had experienced in the workplace. That kind of practical perspective is rare in a classroom, and it made his contributions valuable not only to his own learning but to the rest of the class as well.",
+        "He was always prepared and engaged. It did not surprise me to learn that he was later inducted into the Upsilon Pi Epsilon honor society. That is exactly the kind of student he was in my class.",
+        "Beyond his academic performance, Abhirup is easy to work with. He listens well, treats people with respect, and communicates clearly, qualities that are just as important in project management as technical ability.",
+        "I recommend Abhirup for any IT, DevSecOps, Quality Assurance, or IT leadership role. I am confident he would be an asset to any organization."
+      ]
+    }
+  ],
   "education": [
     {
       "school": "Illinois Institute of Technology",
