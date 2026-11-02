@@ -32,28 +32,129 @@
       "description": "Real-time health checks, uptime, and an outage log. React, TypeScript, Jest.",
       "url": "https://abhirup-code.github.io/live-status-dashboard/",
       "code": "https://github.com/Abhirup-code/live-status-dashboard",
-      "style": "feature"
+      "style": "feature",
+      "caseStudy": {
+        "slug": "live-status-dashboard",
+        "problem": "Health check results only help if someone notices a problem the moment it starts. My aws-healthcheck-iac project writes health checks to a JSON report, so I built a dashboard that shows that report live and makes outages obvious.",
+        "built": [
+          "Summary cards and trend lines for pass rate and latency, refreshed every 5 seconds",
+          "Uptime for each check and a strip of recent results, so a flapping check stands out",
+          "A log of every outage and recovery with the time and the error",
+          "Search, a status filter, and sortable columns",
+          "CSV export that neutralizes spreadsheet formula injection",
+          "If a refresh fails, an error banner appears and the last good data stays on screen"
+        ],
+        "results": [
+          "87 Jest and React Testing Library tests",
+          "No WCAG 2.1 AA issues found by axe-core in light and dark mode",
+          "A live demo on GitHub Pages, deployed automatically, with all data synthetic"
+        ],
+        "tech": [
+          "React",
+          "TypeScript",
+          "Vite",
+          "Jest",
+          "React Testing Library",
+          "GitHub Actions",
+          "GitHub Pages"
+        ]
+      }
     },
     {
       "title": "CSV Quality Gate",
       "kicker": "GitHub Action",
       "description": "Checks CSV files against rules, quarantines bad rows, and fails CI on bad data.",
       "url": "https://github.com/Abhirup-code/CSV_Quality_Gate",
-      "style": "accent"
+      "style": "accent",
+      "caseStudy": {
+        "slug": "csv-quality-gate",
+        "problem": "Bad rows in a CSV file, like missing values, typos, and duplicates, quietly break reports and imports. Teams need a check that stops bad data before it is loaded.",
+        "built": [
+          "A JSON rules file for types, ranges, allowed values, patterns, uniqueness, date ranges, and blank limits",
+          "Rules that compare two columns, like ship date on or after order date",
+          "infer, which drafts a rules file from a known-good CSV",
+          "Quarantine that splits rows into passed and failed files with the reasons",
+          "JSON, Markdown, HTML, and JUnit reports, and a reusable GitHub Action"
+        ],
+        "results": [
+          "129 tests, including Hypothesis property tests that check any file passes the rules inferred from it",
+          "Found and fixed real bugs: Excel CSV files made the first column look missing, and a text bound crashed the check",
+          "CI with pinned actions, ruff security lint, and a job that tests the GitHub Action itself"
+        ],
+        "tech": [
+          "Python",
+          "pytest",
+          "Hypothesis",
+          "GitHub Actions",
+          "ruff"
+        ]
+      }
     },
     {
       "title": "Honest Fit",
       "kicker": "Local AI",
       "description": "A local AI resume matcher that never invents skills you do not have.",
       "url": "https://github.com/Abhirup-code/Honest_Fit",
-      "style": "lime"
+      "style": "lime",
+      "caseStudy": {
+        "slug": "honest-fit",
+        "problem": "AI resume tools happily improve a resume by inventing skills and numbers. For a resume, that is the worst possible help.",
+        "built": [
+          "A keyword analysis of about 170 skills that splits required from nice-to-have and quotes the resume line that proves each match",
+          "A local AI model through Ollama, so resumes never leave the computer and there is no API cost",
+          "An honesty guard that blocks any AI tip that adds a skill or a number the resume does not show",
+          "PDF and Word upload, parsed in a separate process with time and memory limits"
+        ],
+        "results": [
+          "About 99% line and branch test coverage, with Hypothesis property tests",
+          "Coverage-guided fuzzing with Atheris, which found a real PDF parsing bug that is now fixed",
+          "CodeQL, gitleaks, pip-audit, and a container scan on every push"
+        ],
+        "tech": [
+          "Python",
+          "FastAPI",
+          "Ollama",
+          "pypdf",
+          "Hypothesis",
+          "Atheris",
+          "Docker"
+        ]
+      }
     },
     {
       "title": "HelpDesk Autopilot",
       "kicker": "IT automation",
       "description": "Automates onboarding, offboarding, and password resets with approvals and an audit log.",
       "url": "https://github.com/Abhirup-code/HelpDesk_Autopilot",
-      "style": "blue"
+      "style": "blue",
+      "caseStudy": {
+        "slug": "helpdesk-autopilot",
+        "problem": "At small companies, one or two IT people handle every request by hand. Password resets eat the day, offboarding gets missed, and nobody can say who changed whose access or how long tickets take.",
+        "built": [
+          "One-time password reset links that expire in 15 minutes",
+          "New-hire accounts and groups created from the request, and leavers disabled on their last day",
+          "Manager approval for access, plus a second IT approval for admin rights",
+          "An audit log the database itself refuses to delete",
+          "A web portal for employees, managers, and IT agents",
+          "Prometheus metrics and a Grafana SLA dashboard with alerts"
+        ],
+        "results": [
+          "A 90% test coverage gate and Playwright browser tests",
+          "CI with Trivy and CodeQL security scans",
+          "Portal security: directory sign-in, CSRF tokens, lockout after 5 wrong passwords, and a strict Content-Security-Policy"
+        ],
+        "tech": [
+          "Python",
+          "FastAPI",
+          "PostgreSQL",
+          "OpenLDAP",
+          "PowerShell",
+          "Docker Compose",
+          "Prometheus",
+          "Grafana",
+          "Playwright"
+        ]
+      }
     },
     {
       "title": "Recipe Scaler",
@@ -61,7 +162,33 @@
       "description": "Scales recipes, converts units, and reads steps aloud in cook mode.",
       "url": "https://abhirup-code.github.io/Recipe_Scaler/",
       "code": "https://github.com/Abhirup-code/Recipe_Scaler",
-      "style": "outline"
+      "style": "outline",
+      "caseStudy": {
+        "slug": "recipe-scaler",
+        "problem": "Recipes are written for one number of people in one set of units, and they are hard to follow with messy hands.",
+        "built": [
+          "Serving scaling that stays readable, like 1½ cups instead of 1.5",
+          "Scale to what you have, and switch between US and metric",
+          "Cook mode that keeps the screen on, with hands-free voice control",
+          "Import any pasted recipe, a pantry, and a shopping list that combines units",
+          "Works offline and installs like an app"
+        ],
+        "results": [
+          "Lighthouse 100 for performance, accessibility, best practices, and SEO on the home page (mobile)",
+          "347 unit and component tests with 99% line coverage, plus 30 Playwright end-to-end tests",
+          "No WCAG 2.1 AA issues found by axe-core, and property-based fuzzing of the recipe parser"
+        ],
+        "tech": [
+          "Next.js",
+          "React",
+          "TypeScript",
+          "Vitest",
+          "Playwright",
+          "axe-core",
+          "Lighthouse CI",
+          "GitHub Pages"
+        ]
+      }
     }
   ],
   "moreProjects": [
@@ -117,7 +244,7 @@
       "dates": "Dec 2024 to Aug 2025",
       "title": "Senior Test Project Engineer",
       "org": "Wipro · Client: Qatar Airways (CROAMIS)",
-      "place": "Bengaluru",
+      "place": "Bengaluru, India",
       "points": [
         "Delivered zero critical defects across 26+ release cycles for a global airline by validating data integrity with SQL on PostgreSQL and MySQL.",
         "Caught defects early, when they are cheapest to fix, by working with analysts and developers to turn each change request into 100+ test cases.",
@@ -128,7 +255,7 @@
       "dates": "Jul 2021 to Nov 2024",
       "title": "Test Project Engineer",
       "org": "Wipro · Client: Qatar Airways (TOPS)",
-      "place": "Bengaluru",
+      "place": "Bengaluru, India",
       "points": [
         "Kept an airline operations application reliable through 50+ releases by running functional, regression, and API testing in Postman.",
         "Kept every release's issues visible to the team by logging and tracking incidents and defects in ServiceNow, JIRA, and Azure DevOps.",
@@ -191,43 +318,75 @@
   ],
   "skills": [
     {
-      "group": "IT support",
+      "group": "IT support and identity",
       "style": "accent",
       "items": [
         "Troubleshooting",
         "ServiceNow",
         "Active Directory",
-        "Entra ID"
+        "Microsoft Entra ID",
+        "M365 Admin Center",
+        "MFA and password resets",
+        "Windows 10/11",
+        "macOS",
+        "Jira",
+        "Azure DevOps"
       ]
     },
     {
-      "group": "Testing",
+      "group": "Testing and QA",
       "style": "lime",
       "items": [
         "Selenium",
         "Playwright",
+        "pytest",
+        "pytest-bdd",
         "Postman",
-        "pytest"
+        "Locust",
+        "Regression testing",
+        "API testing",
+        "Hypothesis"
       ]
     },
     {
-      "group": "DevOps",
+      "group": "DevOps and cloud",
       "style": "blue",
       "items": [
         "GitHub Actions",
         "Docker",
-        "AWS",
-        "Linux"
+        "Terraform",
+        "AWS (IAM, EC2, CloudWatch, Secrets Manager)",
+        "Linux",
+        "Trivy",
+        "CodeQL",
+        "Prometheus",
+        "Grafana"
       ]
     },
     {
-      "group": "Languages",
+      "group": "Data and reporting",
+      "style": "outline",
+      "items": [
+        "SQL",
+        "PostgreSQL",
+        "MySQL",
+        "Power BI",
+        "Tableau",
+        "Excel and VBA"
+      ]
+    },
+    {
+      "group": "Languages and frameworks",
       "style": "outline",
       "items": [
         "Python",
-        "SQL",
         "TypeScript",
-        "Bash"
+        "Bash",
+        "React",
+        "Next.js",
+        "FastAPI",
+        "Flask",
+        "Django"
       ]
     }
   ],
@@ -276,5 +435,10 @@
     "provider": "web3forms",
     "accessKey": "9c2e9fe0-fede-42a0-87c2-d0fc7fa269a4",
     "subject": "New message from abhirupkhan.me"
-  }
+  },
+  "roles": [
+    "IT Support",
+    "QA Automation",
+    "DevOps"
+  ]
 }
