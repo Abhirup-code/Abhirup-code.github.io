@@ -1,0 +1,124 @@
+{
+  "name": "Abhirup Khan",
+  "shortName": "A.K.",
+  "role": "IT Support · QA · DevOps",
+  "intro": "I keep software honest and systems running. 4+ years of QA at Wipro, DevSecOps intern, M.S. IT Management at Illinois Tech (4.0 GPA).",
+  "description": "Abhirup Khan: IT support, QA, and DevOps. Projects, experience, and resume.",
+  "url": "https://abhirupkhan.me/",
+  "location": "Chicago, open to relocation",
+  "badge": "OPEN TO INTERNSHIPS · CHICAGO · ",
+  "photo": null,
+  "links": {
+    "email": "abhirupofficially@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/abhirupkhan/",
+    "github": "https://github.com/Abhirup-code",
+    "resume": "assets/Abhirup_Khan_Resume.pdf"
+  },
+  "ticker": ["IT Support", "QA", "DevOps", "CI/CD", "Automation", "Troubleshooting", "ServiceNow", "Docker", "Python"],
+  "projects": [
+    {
+      "title": "Live Status Dashboard",
+      "kicker": "Live demo",
+      "description": "Real-time health checks, uptime, and an outage log. React, TypeScript, Jest.",
+      "url": "https://abhirup-code.github.io/live-status-dashboard/",
+      "code": "https://github.com/Abhirup-code/live-status-dashboard",
+      "style": "feature"
+    },
+    {
+      "title": "CSV Quality Gate",
+      "kicker": "GitHub Action",
+      "description": "Checks CSV files against rules, quarantines bad rows, and fails CI on bad data.",
+      "url": "https://github.com/Abhirup-code/CSV_Quality_Gate",
+      "style": "accent"
+    },
+    {
+      "title": "Honest Fit",
+      "kicker": "Local AI",
+      "description": "A local AI resume matcher that never invents skills you do not have.",
+      "url": "https://github.com/Abhirup-code/Honest_Fit",
+      "style": "lime"
+    },
+    {
+      "title": "HelpDesk Autopilot",
+      "kicker": "IT automation",
+      "description": "Automates onboarding, offboarding, and password resets with approvals and an audit log.",
+      "url": "https://github.com/Abhirup-code/HelpDesk_Autopilot",
+      "style": "blue"
+    },
+    {
+      "title": "Recipe Scaler",
+      "kicker": "Next.js",
+      "description": "Scales recipes, converts units, and reads steps aloud in cook mode.",
+      "url": "https://abhirup-code.github.io/Recipe_Scaler/",
+      "code": "https://github.com/Abhirup-code/Recipe_Scaler",
+      "style": "outline"
+    }
+  ],
+  "stat": { "value": "50+", "label": "airline releases tested at Wipro" },
+  "experience": [
+    {
+      "dates": "Jun 2026 to Aug 2026",
+      "title": "DevSecOps Intern",
+      "org": "SupplyBistro (Gusto AI Tech, Inc.)",
+      "place": "Chicago, remote",
+      "points": [
+        "Restored all 4 environments (Dev, QA, Stage, Prod) after outages and documented each root cause in a runbook.",
+        "Brought real prices back to the live site within 12 hours of a production incident.",
+        "Cut data leak risk with 8 least-privilege database roles and AWS Secrets Manager."
+      ]
+    },
+    {
+      "dates": "Dec 2024 to Aug 2025",
+      "title": "Senior Test Project Engineer",
+      "org": "Wipro · Client: Qatar Airways (CROAMIS)",
+      "place": "Bengaluru",
+      "points": [
+        "Delivered zero critical defects across 26+ release cycles, validating data with SQL.",
+        "Turned each change request into 100+ test cases with analysts and developers.",
+        "Trained new hires in a 19-member Scrum team; won Building Trust and Victory League awards."
+      ]
+    },
+    {
+      "dates": "Jul 2021 to Nov 2024",
+      "title": "Test Project Engineer",
+      "org": "Wipro · Client: Qatar Airways (TOPS)",
+      "place": "Bengaluru",
+      "points": [
+        "Kept an airline operations app reliable through 50+ releases with functional, regression, and API testing.",
+        "Logged and tracked incidents in ServiceNow, JIRA, and Azure DevOps.",
+        "Saved team hours every release by automating Excel checks with VBA."
+      ]
+    },
+    {
+      "dates": "Jun 2020 to Jul 2020",
+      "title": "Technology Consulting Virtual Intern",
+      "org": "Deloitte (Virtual Internship Program)",
+      "place": "Remote",
+      "points": [
+        "Built Power BI dashboards, KPIs, and measures on data cleaned in Excel."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "school": "Illinois Institute of Technology",
+      "degree": "M.S. Information Technology Management, MIS · Expected May 2027",
+      "details": "GPA 4.0 · Upsilon Pi Epsilon · Graduate Senator, SGA"
+    },
+    {
+      "school": "University of Engineering and Management",
+      "degree": "B.Tech Electronics and Communication Engineering · 2021",
+      "details": "GPA 3.4"
+    }
+  ],
+  "skills": [
+    { "group": "IT support", "style": "accent", "items": ["Troubleshooting", "ServiceNow", "Active Directory", "Entra ID"] },
+    { "group": "Testing", "style": "lime", "items": ["Selenium", "Playwright", "Postman", "pytest"] },
+    { "group": "DevOps", "style": "blue", "items": ["GitHub Actions", "Docker", "AWS", "Linux"] },
+    { "group": "Languages", "style": "outline", "items": ["Python", "SQL", "TypeScript", "Bash"] }
+  ],
+  "contact": {
+    "heading": "Let's talk.",
+    "text": "Looking for IT support, QA, and DevOps internships. Chicago, open to relocation."
+  }
+}
