@@ -9,6 +9,8 @@ const ROOT = dirname(fileURLToPath(import.meta.url));
 const STYLES = ["feature", "accent", "lime", "blue", "outline"];
 
 export const FORM_ENDPOINT = "https://api.web3forms.com/submit";
+// Browsers apply form-action to the redirect after submitting too, so the policy must also allow
+// this site ('self'), or Web3Forms' redirect back to thanks.html is blocked.
 const FORM_ENDPOINT_ORIGIN = "https://api.web3forms.com";
 const ACCESS_KEY = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -190,7 +192,7 @@ export function render(c) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(c.name)} · ${esc(c.role)}</title>
 <meta name="description" content="${esc(c.description ?? c.intro)}">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; script-src 'none'; base-uri 'none'; form-action ${hasForm(c) ? FORM_ENDPOINT_ORIGIN : "'none'"}">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; script-src 'none'; base-uri 'none'; form-action ${hasForm(c) ? `'self' ${FORM_ENDPOINT_ORIGIN}` : "'none'"}">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 ${c.url ? `<link rel="canonical" href="${esc(safeUrl(c.url))}">` : ""}
 <meta property="og:title" content="${esc(c.name)} · ${esc(c.role)}">

@@ -168,7 +168,8 @@ test("the contact form appears only once a Web3Forms key is set", () => {
   assert.ok(html.includes(`<form class="contact-form" action="${FORM_ENDPOINT}" method="POST"`));
   assert.ok(html.includes(`name="access_key" value="${KEY}"`));
   assert.ok(html.includes('name="redirect" value="https://abhirupkhan.me/thanks.html"'));
-  assert.match(html, /form-action https:\/\/api\.web3forms\.com"/);
+  // 'self' is needed too: the browser checks the redirect back to thanks.html against form-action.
+  assert.match(html, /form-action 'self' https:\/\/api\.web3forms\.com"/);
 });
 
 test("the form has labelled, required fields and a hidden spam trap", () => {
