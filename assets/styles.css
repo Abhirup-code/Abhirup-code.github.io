@@ -246,7 +246,7 @@ h1, h2, h3 { margin: 0; }
 .case-back { margin-top: 64px; }
 
 /* Education and skills */
-.about { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding-top: 56px; padding-bottom: 56px; }
+.about { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 16px; padding-top: 56px; padding-bottom: 56px; }
 .card { border-radius: var(--radius); padding: 32px; display: flex; flex-direction: column; gap: 18px; }
 .card-dark { background: var(--inverse-bg); color: var(--inverse-fg); }
 .card-dark .eyebrow { color: var(--inverse-muted); }
