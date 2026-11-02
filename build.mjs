@@ -44,6 +44,9 @@ export function validate(c) {
   for (const [i, p] of (c?.moreProjects ?? []).entries()) {
     need(text(p.title) && text(p.description) && text(p.url), `moreProjects[${i}] needs title, description, and url`);
   }
+  for (const [i, a] of (c?.awards ?? []).entries()) {
+    need(text(a.title) && text(a.org), `awards[${i}] needs title and org`);
+  }
   for (const [i, e] of (c?.experience ?? []).entries()) {
     need(text(e.dates) && text(e.title) && text(e.org), `experience[${i}] needs dates, title, and org`);
     need(Array.isArray(e.points), `experience[${i}].points must be a list`);
@@ -206,7 +209,21 @@ ${(c.moreProjects ?? []).length ? `  <section class="more wrap" aria-labelledby=
       ${(c.skills ?? []).map((s) => `<div class="skill-group"><h3>${esc(s.group)}</h3><ul class="chips">${s.items.map((it) => `<li class="chip chip-${esc(s.style)}">${esc(it)}</li>`).join("")}</ul></div>`).join("\n      ")}
     </div>
   </section>
-</main>
+${(c.awards ?? []).length ? `
+  <section class="awards wrap" id="awards" aria-labelledby="awards-heading">
+    <div class="section-head">
+      <span class="eyebrow">Recognition</span>
+      <h2 id="awards-heading">Honors &amp; <em>awards.</em></h2>
+    </div>
+    <ul class="award-list">${c.awards.map((a, i) => `
+      <li class="award reveal">
+        <span class="award-num" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span>
+        <div><strong>${esc(a.title)}</strong><span>${esc(a.org)}${a.year ? ` · ${esc(a.year)}` : ""}</span></div>
+        <svg class="award-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6-4.9-4.6 6.6-.8z"></path></svg>
+      </li>`).join("")}
+    </ul>
+  </section>
+` : ""}</main>
 <footer class="contact" id="contact">
   <div class="wrap">
     <h2>${esc(c.contact?.heading ?? "Let's talk.")}</h2>

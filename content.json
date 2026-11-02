@@ -198,6 +198,24 @@
       ]
     }
   ],
+  "awards": [
+    {
+      "title": "Building Trust Award",
+      "org": "Wipro"
+    },
+    {
+      "title": "Victory League Award",
+      "org": "Wipro"
+    },
+    {
+      "title": "Upsilon Pi Epsilon",
+      "org": "Honor society for computing and information disciplines, Illinois Tech"
+    },
+    {
+      "title": "Elected Graduate Senator",
+      "org": "Student Government Association, Illinois Tech"
+    }
+  ],
   "contact": {
     "heading": "Let's talk.",
     "text": "Looking for IT support, QA, and DevOps opportunities. Chicago, open to relocation."

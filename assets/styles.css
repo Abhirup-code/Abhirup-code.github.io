@@ -132,6 +132,18 @@ h1, h2, h3 { margin: 0; }
 .chip-blue { background: var(--blue); color: #ffffff; }
 .chip-outline { border: 2px solid var(--ink); }
 
+/* Honors and awards */
+.awards { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; padding-top: 32px; padding-bottom: 56px; }
+.awards .section-head { grid-column: 1 / span 4; }
+.award-list { grid-column: 6 / span 7; list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--ink); }
+.award { display: grid; grid-template-columns: 56px 1fr 32px; gap: 16px; align-items: center; padding: 20px 4px; border-bottom: 2px solid var(--ink); transition: background .25s; }
+.award:hover { background: #ffffff; }
+.award-num { font: 700 20px/1 var(--serif); color: var(--accent); }
+.award strong { display: block; font: 700 clamp(22px, 2.2vw, 28px)/1.15 var(--serif); }
+.award div span { display: block; margin-top: 2px; font-size: 15px; color: var(--muted); }
+.award-star { width: 28px; height: 28px; fill: var(--accent); transition: transform .4s; }
+.award:hover .award-star { transform: rotate(72deg) scale(1.15); }
+
 /* Contact */
 .contact { margin-top: 24px; background: var(--accent); color: var(--on-accent); padding: 72px 0; }
 .contact h2 { font: 900 clamp(48px, 7vw, 88px)/0.92 var(--serif); letter-spacing: -0.03em; }
@@ -154,7 +166,8 @@ h1, h2, h3 { margin: 0; }
 @media (max-width: 960px) {
   .tile:nth-child(n) { grid-column: span 6; grid-row: auto; }
   .tile:nth-child(1) { grid-column: 1 / -1; min-height: 280px; }
-  .section-head, .timeline { grid-column: 1 / -1; }
+  .section-head, .timeline, .awards .section-head, .award-list { grid-column: 1 / -1; }
+  .award-list { margin-top: 24px; }
   .timeline { margin-top: 24px; }
   .about { grid-template-columns: 1fr; }
 }
@@ -175,6 +188,7 @@ h1, h2, h3 { margin: 0; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .ticker-track, .badge, .reveal { animation: none; }
-  .tile, .arrow, .more-card a { transition: none; }
+  .tile, .arrow, .more-card a, .award, .award-star { transition: none; }
+  .award:hover .award-star { transform: none; }
   .tile:hover, .more-card a:hover { transform: none; }
 }

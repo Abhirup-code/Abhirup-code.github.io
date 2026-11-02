@@ -114,3 +114,20 @@ test("the badge text is fitted around its circle whatever its length", () => {
   const html = render(content);
   assert.match(html, /<textPath href="#badge-circle" textLength="370" lengthAdjust="spacing">OPEN TO OPPORTUNITIES/);
 });
+
+test("awards are listed in order, are optional, and need a title and org", () => {
+  const html = render(content);
+  const section = html.slice(html.indexOf('id="awards"'), html.indexOf('id="contact"'));
+  const positions = content.awards.map((a) => section.indexOf(esc(a.title)));
+  assert.ok(positions.every((p) => p > 0));
+  assert.deepEqual([...positions].sort((a, b) => a - b), positions);
+  const none = copy();
+  delete none.awards;
+  assert.ok(!render(none).includes("Honors &amp;"));
+  const bad = copy();
+  bad.awards[0] = { title: "Award" };
+  assert.ok(validate(bad).includes("awards[0] needs title and org"));
+  const dated = copy();
+  dated.awards[0].year = "2023";
+  assert.ok(render(dated).includes("Wipro · 2023"));
+});
