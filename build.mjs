@@ -41,6 +41,9 @@ export function validate(c) {
     need(text(p.title) && text(p.description) && text(p.url), `projects[${i}] needs title, description, and url`);
     need(STYLES.includes(p.style), `projects[${i}].style must be one of ${STYLES.join(", ")}`);
   }
+  for (const [i, p] of (c?.moreProjects ?? []).entries()) {
+    need(text(p.title) && text(p.description) && text(p.url), `moreProjects[${i}] needs title, description, and url`);
+  }
   for (const [i, e] of (c?.experience ?? []).entries()) {
     need(text(e.dates) && text(e.title) && text(e.org), `experience[${i}] needs dates, title, and org`);
     need(Array.isArray(e.points), `experience[${i}].points must be a list`);
@@ -52,7 +55,7 @@ export function validate(c) {
   const all = JSON.stringify(c ?? {});
   need(!all.includes("\u2014"), "content uses an em dash; use a comma, colon, or 'to' instead");
   const links = [c?.links?.linkedin, c?.links?.github, c?.links?.resume, c?.photo, c?.url,
-    ...(c?.projects ?? []).flatMap((p) => [p.url, p.code])].filter(Boolean);
+    ...(c?.projects ?? []).flatMap((p) => [p.url, p.code]), ...(c?.moreProjects ?? []).map((p) => p.url)].filter(Boolean);
   for (const link of links) {
     try {
       safeUrl(link);
@@ -78,6 +81,17 @@ function projectTile(p, i) {
           <span class="tile-body"><strong class="tile-title">${esc(p.title)}</strong><span class="tile-desc">${esc(p.description)}</span></span>
         </a>${code}
       </article>`;
+}
+
+function moreCard(p) {
+  return `
+      <li class="more-card reveal">
+        <a href="${esc(safeUrl(p.url))}"${linkAttrs(p.url)}>
+          <strong>${esc(p.title)} <span aria-hidden="true">↗</span></strong>
+          <span class="more-desc">${esc(p.description)}</span>
+          ${p.tech ? `<span class="more-tech">${esc(p.tech)}</span>` : ""}
+        </a>
+      </li>`;
 }
 
 function job(e, i) {
@@ -153,7 +167,7 @@ ${c.url ? `<meta property="og:url" content="${esc(safeUrl(c.url))}">` : ""}
       <svg class="badge" viewBox="0 0 168 168" role="img" aria-label="${esc(c.badge.replaceAll("·", ",").replace(/[,\s]+$/, ""))}">
         <defs><path id="badge-circle" d="M84,84 m-60,0 a60,60 0 1,1 120,0 a60,60 0 1,1 -120,0"></path></defs>
         <circle cx="84" cy="84" r="84" class="badge-bg"></circle>
-        <text><textPath href="#badge-circle">${esc(c.badge)}</textPath></text>
+        <text><textPath href="#badge-circle" textLength="370" lengthAdjust="spacing">${esc(c.badge)}</textPath></text>
         <path d="M70 98 L98 70 M78 70 H98 V90" class="badge-arrow"></path>
       </svg>
     </div>
@@ -166,7 +180,13 @@ ${c.url ? `<meta property="og:url" content="${esc(safeUrl(c.url))}">` : ""}
     </div>
   </section>
 
-  <section class="experience wrap" id="experience" aria-labelledby="exp-heading">
+${(c.moreProjects ?? []).length ? `  <section class="more wrap" aria-labelledby="more-heading">
+    <h2 id="more-heading" class="eyebrow">More projects</h2>
+    <ul class="more-grid">${c.moreProjects.map(moreCard).join("")}
+    </ul>
+  </section>
+
+` : ""}  <section class="experience wrap" id="experience" aria-labelledby="exp-heading">
     <div class="section-head">
       <span class="eyebrow">Experience</span>
       <h2 id="exp-heading">Where I've <em>worked.</em></h2>

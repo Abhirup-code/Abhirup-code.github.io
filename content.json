@@ -6,7 +6,7 @@
   "description": "Abhirup Khan: IT support, QA, and DevOps. Projects, experience, and resume.",
   "url": "https://abhirupkhan.me/",
   "location": "Chicago, open to relocation",
-  "badge": "OPEN TO INTERNSHIPS · CHICAGO · ",
+  "badge": "OPEN TO OPPORTUNITIES · CHICAGO · ",
   "photo": null,
   "links": {
     "email": "abhirupofficially@gmail.com",
@@ -14,7 +14,17 @@
     "github": "https://github.com/Abhirup-code",
     "resume": "assets/Abhirup_Khan_Resume.pdf"
   },
-  "ticker": ["IT Support", "QA", "DevOps", "CI/CD", "Automation", "Troubleshooting", "ServiceNow", "Docker", "Python"],
+  "ticker": [
+    "IT Support",
+    "QA",
+    "DevOps",
+    "CI/CD",
+    "Automation",
+    "Troubleshooting",
+    "ServiceNow",
+    "Docker",
+    "Python"
+  ],
   "projects": [
     {
       "title": "Live Status Dashboard",
@@ -54,7 +64,42 @@
       "style": "outline"
     }
   ],
-  "stat": { "value": "50+", "label": "airline releases tested at Wipro" },
+  "moreProjects": [
+    {
+      "title": "Pipeline Pilot",
+      "description": "Test automation for a Flask app: Playwright UI tests, pytest API tests, Locust load tests, and a Docker CI/CD pipeline.",
+      "tech": "Playwright · pytest · Locust · Docker",
+      "url": "https://github.com/Abhirup-code/pipeline-pilot"
+    },
+    {
+      "title": "Secure Supply Chain",
+      "description": "A hardened DevSecOps pipeline that scans every change, signs every image, and blocks unsigned images in Kubernetes.",
+      "tech": "GitHub Actions · Trivy · cosign · Kubernetes",
+      "url": "https://github.com/Abhirup-code/Secure-supply-chain"
+    },
+    {
+      "title": "AWS Health Check IaC",
+      "description": "A Terraform monitoring stack: a scheduled Lambda checks URLs and alerts through CloudWatch and SNS, all tested without an AWS account.",
+      "tech": "Terraform · AWS Lambda · LocalStack",
+      "url": "https://github.com/Abhirup-code/aws-healthcheck-iac"
+    },
+    {
+      "title": "Fulfillment Radar",
+      "description": "SQL and Python analytics for a marketplace: revenue, cancellations, and seller delivery KPIs, checked with tests.",
+      "tech": "SQL · Python",
+      "url": "https://github.com/Abhirup-code/fulfillment-radar"
+    },
+    {
+      "title": "Trailwatch",
+      "description": "An outdoor conditions data pipeline with geospatial processing, a conditions score, a REST API, and a map.",
+      "tech": "Python · Flask · Leaflet",
+      "url": "https://github.com/Abhirup-code/Trailwatch"
+    }
+  ],
+  "stat": {
+    "value": "50+",
+    "label": "airline releases tested at Wipro"
+  },
   "experience": [
     {
       "dates": "Jun 2026 to Aug 2026",
@@ -112,13 +157,49 @@
     }
   ],
   "skills": [
-    { "group": "IT support", "style": "accent", "items": ["Troubleshooting", "ServiceNow", "Active Directory", "Entra ID"] },
-    { "group": "Testing", "style": "lime", "items": ["Selenium", "Playwright", "Postman", "pytest"] },
-    { "group": "DevOps", "style": "blue", "items": ["GitHub Actions", "Docker", "AWS", "Linux"] },
-    { "group": "Languages", "style": "outline", "items": ["Python", "SQL", "TypeScript", "Bash"] }
+    {
+      "group": "IT support",
+      "style": "accent",
+      "items": [
+        "Troubleshooting",
+        "ServiceNow",
+        "Active Directory",
+        "Entra ID"
+      ]
+    },
+    {
+      "group": "Testing",
+      "style": "lime",
+      "items": [
+        "Selenium",
+        "Playwright",
+        "Postman",
+        "pytest"
+      ]
+    },
+    {
+      "group": "DevOps",
+      "style": "blue",
+      "items": [
+        "GitHub Actions",
+        "Docker",
+        "AWS",
+        "Linux"
+      ]
+    },
+    {
+      "group": "Languages",
+      "style": "outline",
+      "items": [
+        "Python",
+        "SQL",
+        "TypeScript",
+        "Bash"
+      ]
+    }
   ],
   "contact": {
     "heading": "Let's talk.",
-    "text": "Looking for IT support, QA, and DevOps internships. Chicago, open to relocation."
+    "text": "Looking for IT support, QA, and DevOps opportunities. Chicago, open to relocation."
   }
 }

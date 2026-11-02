@@ -54,7 +54,7 @@ h1, h2, h3 { margin: 0; }
 .badge { width: 140px; height: 140px; animation: spin 18s linear infinite; }
 .has-photo .badge { position: absolute; left: -60px; bottom: -10px; }
 .badge-bg { fill: var(--accent); }
-.badge text { font: 700 14px var(--sans); letter-spacing: 3px; fill: var(--on-accent); }
+.badge text { font: 700 12.5px var(--sans); fill: var(--on-accent); }
 .badge-arrow { stroke: var(--on-accent); stroke-width: 4; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -88,6 +88,17 @@ h1, h2, h3 { margin: 0; }
 .tile-blue { background: var(--blue); color: #ffffff; }
 .tile-outline { background: #ffffff; color: var(--ink); border: 2px solid var(--ink); }
 .tile-outline .tile-code { color: var(--accent); }
+
+/* More projects */
+.more { padding-top: 8px; padding-bottom: 24px; }
+.more .eyebrow { margin-bottom: 16px; }
+.more-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 16px; }
+.more-card a { display: flex; flex-direction: column; gap: 8px; height: 100%; padding: 22px 24px; border: 2px solid var(--ink); border-radius: var(--radius); background: #ffffff; text-decoration: none; transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s; }
+.more-card a:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(28, 25, 23, .14); }
+.more-card strong { font: 700 22px/1.15 var(--serif); }
+.more-card strong span { color: var(--accent); }
+.more-desc { font-size: 15px; color: var(--ink-2); }
+.more-tech { margin-top: auto; padding-top: 6px; font-size: 13px; font-weight: 600; color: var(--muted); }
 
 /* Experience timeline */
 .experience { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; padding-top: 72px; padding-bottom: 40px; }
@@ -164,6 +175,6 @@ h1, h2, h3 { margin: 0; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .ticker-track, .badge, .reveal { animation: none; }
-  .tile, .arrow { transition: none; }
-  .tile:hover { transform: none; }
+  .tile, .arrow, .more-card a { transition: none; }
+  .tile:hover, .more-card a:hover { transform: none; }
 }

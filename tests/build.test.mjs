@@ -19,7 +19,7 @@ test("every job, project, school, and skill appears on the page", () => {
     assert.ok(html.includes(esc(job.dates)), job.dates);
     for (const point of job.points) assert.ok(html.includes(esc(point)), point);
   }
-  for (const p of content.projects) assert.ok(html.includes(esc(p.title)), p.title);
+  for (const p of [...content.projects, ...content.moreProjects]) assert.ok(html.includes(esc(p.title)), p.title);
   for (const e of content.education) assert.ok(html.includes(esc(e.school)), e.school);
   for (const s of content.skills) for (const item of s.items) assert.ok(html.includes(esc(item)), item);
 });
@@ -97,4 +97,20 @@ test("the build writes the page, assets, domain, and 404 page", () => {
     assert.ok(existsSync(join(out, file)), file);
   }
   assert.equal(readFileSync(join(out, "CNAME"), "utf8").trim(), "abhirupkhan.me");
+});
+
+test("more projects are optional, and need a title, description, and safe link", () => {
+  const none = copy();
+  delete none.moreProjects;
+  assert.ok(!render(none).includes("More projects"));
+  const bad = copy();
+  bad.moreProjects[0] = { title: "X", description: "", url: "javascript:alert(1)" };
+  const problems = validate(bad);
+  assert.ok(problems.includes("moreProjects[0] needs title, description, and url"));
+  assert.ok(problems.some((p) => p.startsWith("Link not allowed")));
+});
+
+test("the badge text is fitted around its circle whatever its length", () => {
+  const html = render(content);
+  assert.match(html, /<textPath href="#badge-circle" textLength="370" lengthAdjust="spacing">OPEN TO OPPORTUNITIES/);
 });
