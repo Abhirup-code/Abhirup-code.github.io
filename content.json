@@ -107,9 +107,10 @@
       "org": "SupplyBistro (Gusto AI Tech, Inc.)",
       "place": "Chicago, remote",
       "points": [
-        "Restored all 4 environments (Dev, QA, Stage, Prod) after outages and documented each root cause in a runbook.",
-        "Brought real prices back to the live site within 12 hours of a production incident.",
-        "Cut data leak risk with 8 least-privilege database roles and AWS Secrets Manager."
+        "Kept the engineering team shipping by restoring all 4 environments (Dev, QA, Stage, Prod) after outages, tracing each failure to its root cause and documenting the fix in a runbook.",
+        "Protected revenue by bringing real prices back to the live site within 12 hours of a production incident, tracing a \"TBD\" pricing page to a stale container and redeploying it.",
+        "Protected checkout revenue by automating Selenium tests for product creation, orders, and Stripe payments that run before release.",
+        "Reduced data leak risk by limiting database access to 8 least-privilege roles and moving passwords into AWS Secrets Manager."
       ]
     },
     {
@@ -118,9 +119,9 @@
       "org": "Wipro · Client: Qatar Airways (CROAMIS)",
       "place": "Bengaluru",
       "points": [
-        "Delivered zero critical defects across 26+ release cycles, validating data with SQL.",
-        "Turned each change request into 100+ test cases with analysts and developers.",
-        "Trained new hires in a 19-member Scrum team; won Building Trust and Victory League awards."
+        "Delivered zero critical defects across 26+ release cycles for a global airline by validating data integrity with SQL on PostgreSQL and MySQL.",
+        "Caught defects early, when they are cheapest to fix, by working with analysts and developers to turn each change request into 100+ test cases.",
+        "Got new hires contributing faster by training them in a 19-member Scrum team; recognized with the Building Trust, Round of Applause, and Habit Flagbearer awards."
       ]
     },
     {
@@ -129,9 +130,10 @@
       "org": "Wipro · Client: Qatar Airways (TOPS)",
       "place": "Bengaluru",
       "points": [
-        "Kept an airline operations app reliable through 50+ releases with functional, regression, and API testing.",
-        "Logged and tracked incidents in ServiceNow, JIRA, and Azure DevOps.",
-        "Saved team hours every release by automating Excel checks with VBA."
+        "Kept an airline operations application reliable through 50+ releases by running functional, regression, and API testing in Postman.",
+        "Kept every release's issues visible to the team by logging and tracking incidents and defects in ServiceNow, JIRA, and Azure DevOps.",
+        "Saved team hours every release by automating repetitive Excel checks with VBA.",
+        "Named Best Individual in Delivery and Operations, Middle East, on the Qatar Airways account; also won the Victory League and Inspiring Performance awards."
       ]
     },
     {
@@ -140,7 +142,7 @@
       "org": "Deloitte (Virtual Internship Program)",
       "place": "Remote",
       "points": [
-        "Built Power BI dashboards, KPIs, and measures on data cleaned in Excel."
+        "Helped stakeholders track financial performance at a glance by building Power BI dashboards, KPIs, and calculated measures on raw data cleaned in Excel."
       ]
     }
   ],
