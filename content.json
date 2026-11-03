@@ -221,6 +221,18 @@
       "description": "An outdoor conditions data pipeline with geospatial processing, a conditions score, a REST API, and a map.",
       "tech": "Python · Flask · Leaflet",
       "url": "https://github.com/Abhirup-code/Trailwatch"
+    },
+    {
+      "title": "Bike Demand vs Weather",
+      "description": "How weather and seasons drive daily bike rentals (Capital Bikeshare, 2011 to 2012), using EDA, hypothesis tests, and stepwise regression in R. Adjusted R² of 0.835.",
+      "tech": "R · Linear regression · Illinois Tech",
+      "url": "https://www.linkedin.com/in/abhirupkhan/details/projects/"
+    },
+    {
+      "title": "Expense Tracker",
+      "description": "A Java and JavaFX expense tracker with full CRUD to log and monitor spending, built with OOP and SQL queries.",
+      "tech": "Java · JavaFX · SQL · Illinois Tech",
+      "url": "https://www.linkedin.com/in/abhirupkhan/details/projects/"
     }
   ],
   "stat": {
@@ -381,7 +393,9 @@
       "items": [
         "Python",
         "TypeScript",
+        "Java",
         "Bash",
+        "R",
         "React",
         "Next.js",
         "FastAPI",
@@ -413,6 +427,9 @@
     "Excel and VBA": [
       "VBA",
       "cleaned in Excel"
+    ],
+    "R": [
+      "in R"
     ]
   },
   "awards": [
