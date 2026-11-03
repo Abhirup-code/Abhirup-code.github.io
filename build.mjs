@@ -527,7 +527,7 @@ ${(c.recommendations ?? []).length ? `  <section class="recs wrap" id="recommend
 ` : ""}  <section class="about wrap" id="about" aria-label="Education and skills">
     <div class="card card-dark reveal">
       <h2 class="eyebrow">Education</h2>
-      ${(c.education ?? []).map((e) => `<div class="school"><strong>${esc(e.school)}</strong><span>${esc(e.degree)}</span>${e.details ? `<span>${esc(e.details)}</span>` : ""}</div>`).join("\n      ")}
+      ${(c.education ?? []).map((e) => `<div class="school"><strong>${esc(e.school)}</strong>${e.place ? `<span class="school-place">${esc(e.place)}</span>` : ""}<span>${esc(e.degree)}</span>${e.details ? `<span>${esc(e.details)}</span>` : ""}</div>`).join("\n      ")}
     </div>
     <div class="card card-outline reveal">
       <h2 class="eyebrow">Skills</h2>

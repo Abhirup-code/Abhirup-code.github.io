@@ -319,11 +319,13 @@
   "education": [
     {
       "school": "Illinois Institute of Technology",
+      "place": "Chicago, Illinois",
       "degree": "M.S. Information Technology Management, MIS · Expected May 2027",
       "details": "GPA 4.0 · Upsilon Pi Epsilon · Graduate Senator, SGA"
     },
     {
       "school": "University of Engineering and Management",
+      "place": "Kolkata, India",
       "degree": "B.Tech Electronics and Communication Engineering · 2021",
       "details": "GPA 3.4"
     }

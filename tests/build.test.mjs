@@ -20,7 +20,10 @@ test("every job, project, school, and skill appears on the page", () => {
     for (const point of job.points) assert.ok(html.includes(esc(point)), point);
   }
   for (const p of [...content.projects, ...content.moreProjects]) assert.ok(html.includes(esc(p.title)), p.title);
-  for (const e of content.education) assert.ok(html.includes(esc(e.school)), e.school);
+  for (const e of content.education) {
+    assert.ok(html.includes(esc(e.school)), e.school);
+    if (e.place) assert.ok(html.includes(`<span class="school-place">${esc(e.place)}</span>`), e.place);
+  }
   for (const s of content.skills) for (const item of s.items) assert.ok(html.includes(esc(item)), item);
 });
 
