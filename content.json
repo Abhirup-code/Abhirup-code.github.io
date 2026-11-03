@@ -368,7 +368,6 @@
         "Docker",
         "Terraform",
         "AWS (IAM, EC2, CloudWatch, Secrets Manager)",
-        "Linux",
         "Trivy",
         "CodeQL",
         "Prometheus",
@@ -402,6 +401,17 @@
         "Flask",
         "Django"
       ]
+    },
+    {
+      "group": "Ways of working",
+      "style": "outline",
+      "items": [
+        "SDLC",
+        "Agile and Scrum",
+        "Six Sigma",
+        "Effective communication",
+        "Team player"
+      ]
     }
   ],
   "skillMatch": {
@@ -430,6 +440,13 @@
     ],
     "R": [
       "in R"
+    ],
+    "Agile and Scrum": [
+      "Agile",
+      "Scrum"
+    ],
+    "Team player": [
+      "Scrum team"
     ]
   },
   "awards": [
