@@ -273,6 +273,10 @@ button.btn { font: 600 16px var(--sans); cursor: pointer; }
 
 /* Skill proof: tap a skill to see where it was used. Built on <details>, so it works without JavaScript. */
 .chip-item { position: relative; }
+/* Sections rise into place with a transform, which stacks each one separately; lift the skills
+   card while a list is open so the next section (awards) never paints over it. */
+.about .card { position: relative; }
+.about .card:has(details.proof[open]) { z-index: 50; }
 .proof summary { list-style: none; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
 .proof summary::-webkit-details-marker { display: none; }
 .proof summary:hover, .proof[open] summary { box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--accent-text); }
