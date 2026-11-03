@@ -390,6 +390,31 @@
       ]
     }
   ],
+  "skillMatch": {
+    "API testing": [
+      "API testing",
+      "API tests"
+    ],
+    "Regression testing": [
+      "regression"
+    ],
+    "Windows 10/11": [
+      "Windows 10",
+      "Windows 11"
+    ],
+    "MFA and password resets": [
+      "MFA",
+      "password reset",
+      "password resets"
+    ],
+    "AWS (IAM, EC2, CloudWatch, Secrets Manager)": [
+      "AWS"
+    ],
+    "Excel and VBA": [
+      "VBA",
+      "cleaned in Excel"
+    ]
+  },
   "awards": [
     {
       "title": "Upsilon Pi Epsilon",
@@ -427,6 +452,20 @@
       "year": "Apr 2023"
     }
   ],
+  "leadership": [
+    {
+      "title": "Graduate Senator",
+      "org": "Student Government Association, Illinois Tech",
+      "dates": "2026 to present",
+      "text": "Elected to represent graduate students, working to make student life better."
+    },
+    {
+      "title": "Volunteer Mentor",
+      "org": "Hath Baralei OIIKKO (NGO), Kolkata",
+      "dates": "2020 to 2024",
+      "text": "Mentored kids and teens for four years."
+    }
+  ],
   "contact": {
     "heading": "Let's talk.",
     "text": "Looking for IT support, QA, and DevOps opportunities. Chicago, open to relocation."
@@ -440,5 +479,34 @@
     "IT Support",
     "QA Automation",
     "DevOps"
-  ]
+  ],
+  "quickView": {
+    "title": "Abhirup Khan at a glance",
+    "items": [
+      {
+        "label": "Looking for",
+        "value": "IT Support, QA Automation, and DevOps roles"
+      },
+      {
+        "label": "Availability",
+        "value": "Part-time during the semester"
+      },
+      {
+        "label": "Location",
+        "value": "Chicago, open to relocation"
+      },
+      {
+        "label": "Experience",
+        "value": "4+ years of QA at Wipro, DevSecOps internship at SupplyBistro"
+      },
+      {
+        "label": "Education",
+        "value": "M.S. IT Management, Illinois Tech, graduating May 2027"
+      },
+      {
+        "label": "Top skills",
+        "value": "ServiceNow, Active Directory, Selenium, Playwright, GitHub Actions, Docker, Terraform, AWS, SQL"
+      }
+    ]
+  }
 }
