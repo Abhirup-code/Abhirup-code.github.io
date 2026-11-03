@@ -319,13 +319,13 @@ function job(e, i) {
       </li>`;
 }
 
-/** The recruiter quick view: the facts a recruiter checks first, in one pop-up. */
+/** Quick facts: the key details in one pop-up. */
 function quickDialog(c) {
   const L = c.links;
   return `
   <dialog class="project-dialog quick-dialog" id="dlg-quick" aria-labelledby="dlg-quick-title">
     <form method="dialog" class="dialog-close-form"><button class="dialog-close" aria-label="Close">×</button></form>
-    <p class="eyebrow">For recruiters</p>
+    <p class="eyebrow">Quick facts</p>
     <h2 id="dlg-quick-title">${esc(c.quickView.title ?? c.name)}</h2>
     <dl class="quick-facts">${c.quickView.items.map((q) => `
       <div><dt>${esc(q.label)}</dt><dd>${esc(q.value)}</dd></div>`).join("")}
@@ -471,7 +471,7 @@ ${c.url ? `<meta property="og:url" content="${esc(safeUrl(c.url))}">` : ""}
     <h1><span class="name-first">${esc(first)}</span> <span class="name-last">${esc(rest.join(" "))}.</span></h1>
     <p class="intro">${esc(c.intro)}</p>
     ${roleLine(c)}
-    ${c.quickView ? `<p class="hero-cta"><a class="btn btn-solid magnetic" href="#contact" data-dialog="dlg-quick">Recruiter quick view</a>${L.resume ? `<a class="btn magnetic" href="${esc(safeUrl(L.resume))}">Download resume</a>` : ""}</p>` : ""}
+    ${c.quickView ? `<p class="hero-cta"><a class="btn btn-solid magnetic" href="#contact" data-dialog="dlg-quick">Quick facts</a>${L.resume ? `<a class="btn magnetic" href="${esc(safeUrl(L.resume))}">Download resume</a>` : ""}</p>` : ""}
     <div class="hero-art${photo ? " has-photo" : ""}">${photo}
       <svg class="badge" viewBox="0 0 168 168" role="img" aria-label="${esc(c.badge.replaceAll("·", ",").replace(/[,\s]+$/, ""))}">
         <defs><path id="badge-circle" d="M84,84 m-60,0 a60,60 0 1,1 120,0 a60,60 0 1,1 -120,0"></path></defs>

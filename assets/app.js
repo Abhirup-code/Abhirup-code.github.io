@@ -44,7 +44,7 @@
     el.addEventListener("pointerleave", function () { el.style.transform = ""; });
   });
 
-  /* ---------- Pop-ups (projects and the recruiter quick view) ---------- */
+  /* ---------- Pop-ups (projects and quick facts) ---------- */
   // Several links can open the same pop-up, so each pop-up remembers which one opened it
   // and sends focus back there when it closes.
   function openDialog(dialog, opener) {
@@ -231,7 +231,7 @@
         }
       },
       quickview: {
-        about: "the facts recruiters ask for",
+        about: "the key details at a glance",
         run: function () {
           data.quick.forEach(function (q) { line((q.label + ":                    ").slice(0, 21) + q.value); });
         }
@@ -341,13 +341,10 @@
         }
       },
       hire: {
-        about: "you know you want to",
+        about: "get in touch",
         run: function () {
-          line("Checking references......... ok");
-          line("Running test suite.......... all green");
-          line("Scanning for vulnerabilities none found");
-          line("Hire request accepted. Next step:", "t-head");
-          linkLine("  ", "email " + data.links.email, "mailto:" + data.links.email + "?subject=" + encodeURIComponent("Let's talk about a role"));
+          line("Let's talk:", "t-head");
+          linkLine("  ", data.links.email, "mailto:" + data.links.email);
         }
       },
       sudo: {
@@ -355,7 +352,7 @@
         hidden: true,
         run: function (args) {
           if (args.join(" ").toLowerCase().indexOf("hire") === 0) { commands.hire.run([]); return; }
-          line(user + " is not in the sudoers file. This incident will be reported to the recruiter.", "t-err");
+          line(user + " is not in the sudoers file. Try: hire", "t-err");
         }
       },
       rm: {

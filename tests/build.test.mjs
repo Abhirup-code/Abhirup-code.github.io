@@ -246,9 +246,9 @@ test("the header links to the contact section", () => {
   assert.ok(render(content).includes('<a class="nav-contact" href="#contact">Contact</a>'));
 });
 
-test("the recruiter quick view lists every fact and opens from the hero", () => {
+test("quick facts list every item and open from the hero", () => {
   const html = render(content);
-  assert.ok(html.includes('href="#contact" data-dialog="dlg-quick">Recruiter quick view</a>'));
+  assert.ok(html.includes('href="#contact" data-dialog="dlg-quick">Quick facts</a>'));
   assert.ok(html.includes('<dialog class="project-dialog quick-dialog" id="dlg-quick" aria-labelledby="dlg-quick-title">'));
   for (const q of content.quickView.items) assert.ok(html.includes(`<dt>${esc(q.label)}</dt><dd>${esc(q.value)}</dd>`), q.label);
   assert.match(html, /<button class="btn magnetic copy-email" type="button" data-email="[^"]+" hidden>/);
