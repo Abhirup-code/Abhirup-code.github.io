@@ -3,7 +3,7 @@ import { existsSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { build, esc, FORM_ENDPOINT, hasForm, render, renderCase, safeUrl, validate } from "../build.mjs";
+import { build, esc, FORM_ENDPOINT, hasForm, render, renderCase, safeUrl, skillProof, terminalData, validate } from "../build.mjs";
 
 const content = JSON.parse(readFileSync(new URL("../content.json", import.meta.url), "utf8"));
 const copy = () => structuredClone(content);
@@ -84,7 +84,7 @@ test("scripts can only come from this site, and none are inline", () => {
     assert.match(html, /<meta http-equiv="Content-Security-Policy" content="[^"]*script-src 'self'/);
     const scripts = html.match(/<script[^>]*>/g) ?? [];
     for (const tag of scripts) {
-      assert.match(tag, /^<script (src="(\.\.\/)?assets\/(theme|app)\.js"( defer)?|type="application\/ld\+json")>$/, tag);
+      assert.match(tag, /^<script (src="(\.\.\/)?assets\/(theme|app)\.js"( defer)?|type="application\/ld\+json"|type="application\/json" id="site-data")>$/, tag);
     }
     // style-src has no 'unsafe-inline', so an inline style attribute would be silently ignored.
     assert.ok(!/\sstyle="/.test(html), "no inline style attributes");
@@ -244,4 +244,60 @@ test("a malformed access key is rejected", () => {
 
 test("the header links to the contact section", () => {
   assert.ok(render(content).includes('<a class="nav-contact" href="#contact">Contact</a>'));
+});
+
+test("the recruiter quick view lists every fact and opens from the hero", () => {
+  const html = render(content);
+  assert.ok(html.includes('href="#contact" data-dialog="dlg-quick">Recruiter quick view</a>'));
+  assert.ok(html.includes('<dialog class="project-dialog quick-dialog" id="dlg-quick" aria-labelledby="dlg-quick-title">'));
+  for (const q of content.quickView.items) assert.ok(html.includes(`<dt>${esc(q.label)}</dt><dd>${esc(q.value)}</dd>`), q.label);
+  assert.match(html, /<button class="btn magnetic copy-email" type="button" data-email="[^"]+" hidden>/);
+  const bad = copy();
+  bad.quickView.items[0].value = "";
+  assert.ok(validate(bad).includes("quickView.items[0] needs label and value"));
+});
+
+test("leadership and volunteering are listed, and are optional", () => {
+  const html = render(content);
+  for (const l of content.leadership) {
+    assert.ok(html.includes(`<h3>${esc(l.title)}</h3>`), l.title);
+    assert.ok(html.includes(esc(l.org)), l.org);
+  }
+  const none = copy();
+  delete none.leadership;
+  assert.ok(!render(none).includes('id="leadership"'));
+  const bad = copy();
+  bad.leadership[0] = { title: "X" };
+  assert.ok(validate(bad).includes("leadership[0] needs title, org, and text"));
+});
+
+test("a skill links only to jobs and projects whose own text names it", () => {
+  const html = render(content);
+  const postman = skillProof(content, "Postman").map((s) => s.label);
+  assert.ok(postman.includes("Test Project Engineer, Wipro"));
+  // A dash joins words: the aws-healthcheck-iac name inside another project is not proof of AWS.
+  assert.ok(!skillProof(content, "AWS (IAM, EC2, CloudWatch, Secrets Manager)").some((s) => s.label === "Live Status Dashboard"));
+  assert.ok(!skillProof(content, "pytest").some((s) => /pytest-bdd/.test(s.label)));
+  assert.equal(skillProof(content, "Kubernetes Operator Pro").length, 0);
+  // Chips with proof open a list; chips without stay plain.
+  assert.match(html, /<details class="proof"><summary class="chip chip-lime">Postman<span class="proof-count" aria-hidden="true">\d+<\/span>/);
+  assert.ok(html.includes('<li class="chip chip-accent">Troubleshooting</li>'));
+  for (const [i] of content.experience.entries()) assert.ok(html.includes(`id="job-${i}"`));
+  const bad = copy();
+  bad.skillMatch.Postman = "Postman";
+  assert.ok(validate(bad).some((p) => p.startsWith('skillMatch["Postman"]')));
+});
+
+test("the hidden terminal carries only public page facts as data, never as a script", () => {
+  const html = render(content);
+  assert.match(html, /<button class="term-open" type="button" hidden>/);
+  assert.ok(html.includes('<dialog class="terminal" id="terminal" aria-labelledby="term-title">'));
+  const raw = html.match(/<script type="application\/json" id="site-data">([^<]*)<\/script>/)[1];
+  const data = JSON.parse(raw);
+  assert.deepEqual(data, JSON.parse(JSON.stringify(terminalData(content))));
+  assert.equal(data.links.email, content.links.email);
+  assert.ok(!/\(\d{3}\)\s?\d{3}-\d{4}/.test(raw), "no phone number");
+  const evil = copy();
+  evil.intro = "</script><script>alert(1)</script>";
+  assert.ok(!render(evil).includes("</script><script>alert(1)"));
 });

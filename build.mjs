@@ -80,6 +80,15 @@ export function validate(c) {
   for (const [i, s] of (c?.skills ?? []).entries()) {
     need(STYLES.includes(s.style) && s.style !== "feature", `skills[${i}].style must be accent, lime, blue, or outline`);
   }
+  for (const [i, q] of (c?.quickView?.items ?? []).entries()) {
+    need(text(q.label) && text(q.value), `quickView.items[${i}] needs label and value`);
+  }
+  for (const [i, l] of (c?.leadership ?? []).entries()) {
+    need(text(l.title) && text(l.org) && text(l.text), `leadership[${i}] needs title, org, and text`);
+  }
+  for (const [skill, terms] of Object.entries(c?.skillMatch ?? {})) {
+    need(Array.isArray(terms) && terms.length > 0 && terms.every(text), `skillMatch["${skill}"] must be a list of words to look for`);
+  }
   const key = c?.contactForm?.accessKey ?? "";
   need(key === "" || ACCESS_KEY.test(key), "contactForm.accessKey must be the key Web3Forms emailed you (it looks like 8-4-4-4-12 letters and numbers)");
   // House style: no em dashes anywhere in the content.
@@ -101,6 +110,53 @@ const isExternal = (url) => url.startsWith("https://");
 const linkAttrs = (url) => (isExternal(url) ? ' target="_blank" rel="noopener noreferrer"' : "");
 
 const casePath = (p) => `work/${p.caseStudy.slug}.html`;
+
+/** Words to look for when finding where a skill was used: skillMatch in content.json, or the skill's own name. */
+function skillTerms(c, item) {
+  if (c.skillMatch?.[item]) return c.skillMatch[item];
+  return item.replace(/\(.*?\)/g, "").split(/\s+and\s+/).map((t) => t.trim()).filter((t) => t.length > 1);
+}
+
+/** Every job and project on the page, with its text, for finding where a skill was used. */
+function proofSources(c) {
+  const jobs = c.experience.map((e, i) => ({
+    kind: "Job",
+    label: `${e.title}, ${e.org.split(" · ")[0]}`,
+    href: `#job-${i}`,
+    text: [e.title, e.org, ...e.points].join(" "),
+  }));
+  const projects = c.projects.map((p) => ({
+    kind: "Project",
+    label: p.title,
+    href: p.caseStudy ? casePath(p) : safeUrl(p.url),
+    dialog: p.caseStudy ? `dlg-${p.caseStudy.slug}` : null,
+    text: [p.title, p.description, p.kicker ?? "", ...(p.caseStudy ? [p.caseStudy.problem, ...p.caseStudy.built, ...p.caseStudy.results, ...p.caseStudy.tech] : [])].join(" "),
+  }));
+  const more = (c.moreProjects ?? []).map((p) => ({
+    kind: "Project",
+    label: p.title,
+    href: safeUrl(p.url),
+    text: [p.title, p.description, p.tech ?? ""].join(" "),
+  }));
+  return [...jobs, ...projects, ...more];
+}
+
+/** The jobs and projects whose own text names the skill, so every link is backed by what the page says.
+ * A dash counts as part of a word, so "pytest" does not match "pytest-bdd" and "aws" does not match "aws-healthcheck-iac". */
+export function skillProof(c, item) {
+  const terms = skillTerms(c, item).map((t) => new RegExp(`(?<![A-Za-z0-9-])${t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![A-Za-z0-9-])`, "i"));
+  return proofSources(c).filter((src) => terms.some((re) => re.test(src.text)));
+}
+
+function skillChip(c, item, style) {
+  const proof = skillProof(c, item);
+  if (!proof.length) return `<li class="chip chip-${esc(style)}">${esc(item)}</li>`;
+  const links = proof.map((src) => {
+    const attrs = src.dialog ? ` data-dialog="${esc(src.dialog)}"` : linkAttrs(src.href);
+    return `<li><a href="${esc(src.href)}"${attrs}><span class="proof-kind">${src.kind}</span>${esc(src.label)}</a></li>`;
+  }).join("");
+  return `<li class="chip-item"><details class="proof"><summary class="chip chip-${esc(style)}">${esc(item)}<span class="proof-count" aria-hidden="true">${proof.length}</span><span class="sr-only">, used in ${proof.length} ${proof.length === 1 ? "place" : "places"}</span></summary><div class="proof-pop"><p>Where I used ${esc(item)}</p><ul>${links}</ul></div></details></li>`;
+}
 
 function projectTile(p, i) {
   const n = String(i + 1).padStart(2, "0");
@@ -254,13 +310,96 @@ function contactForm(c) {
 
 function job(e, i) {
   return `
-      <li class="job reveal${i === 0 ? " job-current" : ""}">
+      <li class="job reveal${i === 0 ? " job-current" : ""}" id="job-${i}">
         <span class="job-dot" aria-hidden="true"></span>
         <span class="job-dates">${esc(e.dates)}</span>
         <h3>${esc(e.title)}</h3>
         <p class="job-org">${esc(e.org)}${e.place ? ` · ${esc(e.place)}` : ""}</p>
         <ul>${e.points.map((pt) => `<li>${esc(pt)}</li>`).join("")}</ul>
       </li>`;
+}
+
+/** The recruiter quick view: the facts a recruiter checks first, in one pop-up. */
+function quickDialog(c) {
+  const L = c.links;
+  return `
+  <dialog class="project-dialog quick-dialog" id="dlg-quick" aria-labelledby="dlg-quick-title">
+    <form method="dialog" class="dialog-close-form"><button class="dialog-close" aria-label="Close">×</button></form>
+    <p class="eyebrow">For recruiters</p>
+    <h2 id="dlg-quick-title">${esc(c.quickView.title ?? c.name)}</h2>
+    <dl class="quick-facts">${c.quickView.items.map((q) => `
+      <div><dt>${esc(q.label)}</dt><dd>${esc(q.value)}</dd></div>`).join("")}
+    </dl>
+    <div class="dialog-actions">
+      <a class="btn btn-solid magnetic" href="${esc(safeUrl(`mailto:${L.email}`))}">Email me</a>
+      <button class="btn magnetic copy-email" type="button" data-email="${esc(L.email)}" hidden>Copy email</button>
+      ${L.resume ? `<a class="btn magnetic" href="${esc(safeUrl(L.resume))}">Resume (PDF)</a>` : ""}
+      ${L.linkedin ? `<a class="btn magnetic" href="${esc(safeUrl(L.linkedin))}"${linkAttrs(L.linkedin)}>LinkedIn ↗</a>` : ""}
+    </div>
+    <p class="copy-status" role="status"></p>
+  </dialog>`;
+}
+
+function leadershipSection(c) {
+  return `
+  <section class="leadership wrap" id="leadership" aria-labelledby="lead-heading">
+    <div class="section-head">
+      <span class="eyebrow">Leadership</span>
+      <h2 id="lead-heading">Leading &amp; <em>giving back.</em></h2>
+    </div>
+    <ul class="lead-list">${c.leadership.map((l) => `
+      <li class="lead reveal">
+        ${l.dates ? `<span class="lead-dates">${esc(l.dates)}</span>` : ""}
+        <h3>${esc(l.title)}</h3>
+        <p class="lead-org">${esc(l.org)}</p>
+        <p>${esc(l.text)}</p>
+      </li>`).join("")}
+    </ul>
+  </section>
+`;
+}
+
+/** What the hidden terminal can print. Only public facts that are already on the page. */
+export function terminalData(c) {
+  const L = c.links;
+  return {
+    name: c.name,
+    shortName: c.shortName ?? c.name,
+    role: c.role,
+    roles: c.roles ?? [],
+    intro: c.intro,
+    location: c.location ?? "",
+    links: { email: L.email, linkedin: L.linkedin ?? "", github: L.github ?? "", resume: L.resume ?? "" },
+    skills: (c.skills ?? []).map((s) => ({ group: s.group, items: s.items })),
+    projects: [
+      ...c.projects.map((p) => ({ title: p.title, description: p.description, href: p.caseStudy ? casePath(p) : p.url })),
+      ...(c.moreProjects ?? []).map((p) => ({ title: p.title, description: p.description, href: p.url })),
+    ],
+    experience: c.experience.map((e) => ({ title: e.title, org: e.org, dates: e.dates })),
+    awards: (c.awards ?? []).map((a) => ({ title: a.title, org: a.org })),
+    leadership: (c.leadership ?? []).map((l) => ({ title: l.title, org: l.org, dates: l.dates ?? "" })),
+    quick: (c.quickView?.items ?? []).map((q) => ({ label: q.label, value: q.value })),
+  };
+}
+
+function terminal(c) {
+  // type="application/json" is data, never run, so the Content-Security-Policy still allows no inline scripts.
+  const data = JSON.stringify(terminalData(c)).replaceAll("<", "\\u003c");
+  return `
+<dialog class="terminal" id="terminal" aria-labelledby="term-title">
+  <div class="term-bar">
+    <span class="term-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+    <h2 id="term-title">${esc((c.shortName ?? "guest").toLowerCase())}@${esc(c.url ? new URL(c.url).host : "portfolio")}: ~</h2>
+    <form method="dialog"><button class="term-close" aria-label="Close terminal">×</button></form>
+  </div>
+  <div class="term-out" role="log" aria-live="polite" aria-label="Terminal output" tabindex="0"></div>
+  <form class="term-form" autocomplete="off">
+    <label class="term-prompt" for="term-in">$</label>
+    <input id="term-in" type="text" autocapitalize="off" spellcheck="false" enterkeyhint="send" aria-describedby="term-help">
+  </form>
+  <p class="sr-only" id="term-help">Type help and press Enter to see commands.</p>
+</dialog>
+<script type="application/json" id="site-data">${data}</script>`;
 }
 
 function roleLine(c) {
@@ -332,6 +471,7 @@ ${c.url ? `<meta property="og:url" content="${esc(safeUrl(c.url))}">` : ""}
     <h1><span class="name-first">${esc(first)}</span> <span class="name-last">${esc(rest.join(" "))}.</span></h1>
     <p class="intro">${esc(c.intro)}</p>
     ${roleLine(c)}
+    ${c.quickView ? `<p class="hero-cta"><a class="btn btn-solid magnetic" href="#contact" data-dialog="dlg-quick">Recruiter quick view</a>${L.resume ? `<a class="btn magnetic" href="${esc(safeUrl(L.resume))}">Download resume</a>` : ""}</p>` : ""}
     <div class="hero-art${photo ? " has-photo" : ""}">${photo}
       <svg class="badge" viewBox="0 0 168 168" role="img" aria-label="${esc(c.badge.replaceAll("·", ",").replace(/[,\s]+$/, ""))}">
         <defs><path id="badge-circle" d="M84,84 m-60,0 a60,60 0 1,1 120,0 a60,60 0 1,1 -120,0"></path></defs>
@@ -348,7 +488,7 @@ ${c.url ? `<meta property="og:url" content="${esc(safeUrl(c.url))}">` : ""}
       ${stat}
     </div>
   </section>
-${c.projects.filter((p) => p.caseStudy).map(projectDialog).join("")}
+${c.projects.filter((p) => p.caseStudy).map(projectDialog).join("")}${c.quickView ? quickDialog(c) : ""}
 
 ${(c.moreProjects ?? []).length ? `  <section class="more wrap" aria-labelledby="more-heading">
     <h2 id="more-heading" class="eyebrow">More projects</h2>
@@ -391,7 +531,8 @@ ${(c.recommendations ?? []).length ? `  <section class="recs wrap" id="recommend
     </div>
     <div class="card card-outline reveal">
       <h2 class="eyebrow">Skills</h2>
-      ${(c.skills ?? []).map((s) => `<div class="skill-group"><h3>${esc(s.group)}</h3><ul class="chips">${s.items.map((it) => `<li class="chip chip-${esc(s.style)}">${esc(it)}</li>`).join("")}</ul></div>`).join("\n      ")}
+      <p class="skills-hint">Tap a skill with a number to see the jobs and projects where I used it.</p>
+      ${(c.skills ?? []).map((s) => `<div class="skill-group"><h3>${esc(s.group)}</h3><ul class="chips">${s.items.map((it) => skillChip(c, it, s.style)).join("")}</ul></div>`).join("\n      ")}
     </div>
   </section>
 ${(c.awards ?? []).length ? `
@@ -408,7 +549,7 @@ ${(c.awards ?? []).length ? `
       </li>`).join("")}
     </ul>
   </section>
-` : ""}</main>
+` : ""}${(c.leadership ?? []).length ? leadershipSection(c) : ""}</main>
 <footer class="contact" id="contact">
   <div class="wrap">
     <h2>${esc(c.contact?.heading ?? "Let's talk.")}</h2>
@@ -420,9 +561,9 @@ ${(c.awards ?? []).length ? `
       ${L.resume ? `<li><a class="magnetic" href="${esc(safeUrl(L.resume))}">Resume ↗</a></li>` : ""}
     </ul>
     ${hasForm(c) ? contactForm(c) : ""}
-    <p class="fine">© ${new Date().getFullYear()} ${esc(c.name)}</p>
+    <p class="fine">© ${new Date().getFullYear()} ${esc(c.name)}<button class="term-open" type="button" hidden><span aria-hidden="true">&gt;_</span> Open terminal</button></p>
   </div>
-</footer>
+</footer>${terminal(c)}
 </body>
 </html>
 `;
