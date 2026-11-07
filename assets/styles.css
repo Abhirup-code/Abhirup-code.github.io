@@ -253,6 +253,36 @@ button.btn { font: 600 16px var(--sans); cursor: pointer; }
 .case-section p, .case-section li { font-size: 18px; }
 .case-section ul:not(.chips) { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 10px; }
 .case-back { margin-top: 64px; }
+.case h1 em { font-style: normal; color: var(--accent-text); }
+
+/* Postmortems */
+.postmortems { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; padding-top: 40px; padding-bottom: 40px; }
+.postmortems .section-head a { font-weight: 600; color: var(--accent-text); }
+.postmortems .pm-list { grid-column: 6 / span 7; }
+.pm-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.case .pm-list { margin-top: 40px; }
+.pm-card a { display: flex; flex-direction: column; gap: 8px; padding: 22px 24px; border: 2px solid var(--ink); border-radius: var(--radius); background: var(--surface); color: var(--ink); text-decoration: none; transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s; }
+.pm-card a:hover { transform: translateY(-4px); box-shadow: 0 12px 28px var(--shadow); }
+.pm-card strong { font: 700 clamp(20px, 2.2vw, 24px)/1.2 var(--serif); }
+.pm-card span:last-child { color: var(--text-2); }
+.pm-card-meta { font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent-text); }
+.pm-meta { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 20px; font-size: 14px; font-weight: 600; }
+.pm-meta > * { padding: 4px 12px; border: 2px solid var(--ink); border-radius: 999px; }
+.pm-sev { background: var(--accent); border-color: var(--accent) !important; color: #fff; }
+.pm-impact { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; }
+.pm-impact div { padding: 12px 0; border-top: 2px solid var(--line); }
+.pm-impact dt { font: 600 12px/1.4 var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.pm-impact dd { margin: 4px 0 0; font-size: 17px; font-weight: 500; }
+.pm-timeline { list-style: none; margin: 0; padding: 0 0 0 22px; border-left: 3px solid var(--accent); display: flex; flex-direction: column; gap: 14px; }
+.pm-timeline li { position: relative; font-size: 17px; display: flex; flex-direction: column; gap: 2px; }
+.pm-timeline li::before { content: ""; position: absolute; left: -31px; top: 7px; width: 13px; height: 13px; border-radius: 999px; background: var(--paper); border: 3px solid var(--accent); }
+.pm-time { font: 700 13px ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: var(--accent-text); }
+.pm-two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; }
+.pm-actions { list-style: none; margin: 0; padding: 0 !important; display: flex; flex-direction: column; gap: 12px; }
+.pm-actions li { display: flex; gap: 12px; align-items: baseline; }
+.pm-type { flex: none; min-width: 84px; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; text-align: center; border: 2px solid var(--ink); }
+.pm-type-prevent { background: var(--lime); color: #1c1917; border-color: var(--lime); }
+.pm-type-detect { background: var(--blue); color: #fff; border-color: var(--blue); }
 
 /* Education and skills */
 .about { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 16px; padding-top: 56px; padding-bottom: 56px; }
@@ -387,7 +417,8 @@ button.btn { font: 600 16px var(--sans); cursor: pointer; }
 @media (max-width: 960px) {
   .tile:nth-child(n) { grid-column: span 6; grid-row: auto; }
   .tile:nth-child(1) { grid-column: 1 / -1; min-height: 280px; }
-  .section-head, .timeline, .awards .section-head, .award-list, .recs .section-head, .rec-carousel, .leadership .section-head, .lead-list { grid-column: 1 / -1; }
+  .section-head, .timeline, .awards .section-head, .award-list, .recs .section-head, .rec-carousel, .leadership .section-head, .lead-list, .postmortems .pm-list { grid-column: 1 / -1; }
+  .postmortems .pm-list { margin-top: 24px; }
   .lead-list { margin-top: 24px; }
   .rec-list { margin-top: 24px; gap: 40px; }
   .award-list { margin-top: 24px; }
@@ -413,7 +444,7 @@ button.btn { font: 600 16px var(--sans); cursor: pointer; }
   .nav nav { gap: 12px; }
   .project-dialog { padding: 28px 22px; }
   .card { padding: 24px; }
-  .quick-facts, .lead-list { grid-template-columns: 1fr; }
+  .quick-facts, .lead-list, .pm-impact, .pm-two { grid-template-columns: 1fr; }
   .terminal { font-size: 13px; }
 }
 
@@ -424,7 +455,7 @@ button.btn { font: 600 16px var(--sans); cursor: pointer; }
   .role-anim { display: none; }
   .is-carousel .rec { transition: none; transform: none; }
   .magnetic { transition: none; }
-  .tile, .arrow, .more-card a, .award, .award-star, .lead { transition: none; }
+  .tile, .arrow, .more-card a, .award, .award-star, .lead, .pm-card a { transition: none; }
   .terminal[open] { animation: none; }
   .lead:hover { transform: none; }
   .award:hover .award-star { transform: none; }

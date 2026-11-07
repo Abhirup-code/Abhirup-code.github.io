@@ -540,5 +540,222 @@
         "value": "ServiceNow, Active Directory, Selenium, Playwright, GitHub Actions, Docker, Terraform, AWS, SQL"
       }
     ]
-  }
+  },
+  "postmortems": [
+    {
+      "slug": "game-day-checkout-outage",
+      "date": "2026-11-06",
+      "title": "Game day: full checkout outage in the Burn_Rate lab",
+      "system": "Burn_Rate lab",
+      "severity": "Drill (page)",
+      "summary": "A planned drill: every checkout request failed on purpose. The availability page fired 40 seconds after the first failure, the deploy gate blocked feature releases, a hotfix with a recorded reason got through, and the error rate was back under budget 311 seconds after the fix. The drill also showed how much a short history skews burn-rate alerts, and exposed a wrong assumption in my own tooling about when a page clears.",
+      "impact": [
+        {
+          "label": "What failed",
+          "value": "100% of checkout requests, for 41 seconds"
+        },
+        {
+          "label": "Users affected",
+          "value": "None. This was the lab, on purpose"
+        },
+        {
+          "label": "Time to detect",
+          "value": "40 seconds"
+        },
+        {
+          "label": "Time to recover",
+          "value": "311 seconds after the fix, measured by the 5 minute error rate"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "17:41:37 UTC",
+          "event": "Deploy gate allows a release while checkout is healthy"
+        },
+        {
+          "time": "17:41:47 UTC",
+          "event": "Chaos switch on: every checkout fails"
+        },
+        {
+          "time": "17:42:27 UTC",
+          "event": "CheckoutAvailabilityBudgetBurn (page) fires, 40 seconds in"
+        },
+        {
+          "time": "17:42:27 UTC",
+          "event": "Deploy gate blocks feature releases: error budget exhausted"
+        },
+        {
+          "time": "17:42:28 UTC",
+          "event": "Hotfix allowed through the gate with a recorded reason"
+        },
+        {
+          "time": "17:42:28 UTC",
+          "event": "Mitigated: chaos switch off"
+        },
+        {
+          "time": "17:47:39 UTC",
+          "event": "Recovered: 5 minute error rate back under the 0.5% budget"
+        }
+      ],
+      "rootCause": "The outage itself was intentional. The findings were about the lab and my tooling. The lab had only minutes of history, so even the long alert windows (1 hour, 6 hours) held mostly outage data: the page fired after 40 seconds, and the slower 6x tier (6 hours and 30 minutes) fired too. That tier only clears once its 30 minute window recovers, but the first version of my game day script treated \"page cleared\" as proof of recovery, so it timed out even though the service was already healthy.",
+      "detection": "The fast-burn page fired in 40 seconds. That is faster than production would be: with days of history behind it, the same full outage pages after about 4.5 minutes, which the alert unit tests and the Lab on this site both show.",
+      "wentWell": [
+        "Detection in 40 seconds.",
+        "The gate blocked features but still let the fix through, with the reason on record."
+      ],
+      "wentBadly": [
+        "I treated \"alert cleared\" and \"service recovered\" as the same signal. They use different windows.",
+        "With minutes of history, the alerts and the 30 day budget (about -4,256%) were far more dramatic than they would be in production. Fine for a drill, misleading in a screenshot."
+      ],
+      "actions": [
+        {
+          "action": "Recovery is now judged by the 5 minute error rate dropping under budget; the page clears on its own later.",
+          "type": "Mitigate"
+        },
+        {
+          "action": "Alert unit tests and the Lab start with 3 days of healthy history, so their timings match production.",
+          "type": "Prevent"
+        },
+        {
+          "action": "The Burn_Rate README explains why a page can outlive the incident.",
+          "type": "Document"
+        }
+      ],
+      "link": "https://github.com/Abhirup-code/Burn_Rate"
+    },
+    {
+      "slug": "k6-flag-removed",
+      "date": "2026-11-05",
+      "title": "Load generator crash-looped in CI after a k6 2.x breaking change",
+      "system": "Burn_Rate CI",
+      "severity": "CI failure",
+      "summary": "The end-to-end CI run for Burn_Rate failed: Prometheus was scraping the checkout service but had recorded zero requests. The k6 load generator was crash-looping because k6 2.x removed the --no-summary flag I used. Fixed by switching to --summary-mode=disabled and making the rollout fail fast on startup crashes.",
+      "impact": [
+        {
+          "label": "What failed",
+          "value": "The Kubernetes CI workflow on main; no traffic meant no SLO data"
+        },
+        {
+          "label": "Users affected",
+          "value": "None (lab and CI only)"
+        },
+        {
+          "label": "Time to fix",
+          "value": "Under an hour, the same evening"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "",
+          "event": "\"Run the lab on kind\" fails at \"Prometheus is scraping checkout traffic\": up=1 served=0"
+        },
+        {
+          "time": "",
+          "event": "Pod list shows loadgen in CrashLoopBackOff with 5 restarts"
+        },
+        {
+          "time": "",
+          "event": "Ran k6 2.3.0 locally with the same flags: --no-summary is no longer a flag"
+        },
+        {
+          "time": "",
+          "event": "Fix: --summary-mode=disabled, checked against the real service (31 requests in 3 seconds)"
+        },
+        {
+          "time": "",
+          "event": "Both workflows green"
+        }
+      ],
+      "rootCause": "The manifest pinned grafana/k6:2.3.0 but used a flag from k6 1.x, so the container exited at startup. The Deployment had no readiness check, so the rollout counted the pod as ready for a moment and the setup script reported success. The failure only surfaced later, as missing traffic.",
+      "detection": "The end-to-end CI job, which exists for exactly this. Unit tests and manifest validation had all passed.",
+      "wentWell": [
+        "End-to-end CI caught a break that no unit test could.",
+        "The failure step printed pod status, which pointed straight at the crash loop."
+      ],
+      "wentBadly": [
+        "The pinned image version and its flags were never run together before the push.",
+        "The rollout reported success for a container that was crashing."
+      ],
+      "actions": [
+        {
+          "action": "The load generator rollout waits 15 seconds (minReadySeconds), so a startup crash fails the setup script immediately.",
+          "type": "Detect"
+        },
+        {
+          "action": "The traffic check prints the load generator's logs when it fails.",
+          "type": "Detect"
+        },
+        {
+          "action": "Run the exact pinned version locally before changing its flags.",
+          "type": "Prevent"
+        }
+      ],
+      "link": "https://github.com/Abhirup-code/Burn_Rate"
+    },
+    {
+      "slug": "contact-form-redirect",
+      "date": "2026-11-02",
+      "title": "Contact form sent messages, but visitors never saw the thank-you page",
+      "system": "abhirupkhan.me",
+      "severity": "Minor",
+      "summary": "The new contact form emailed me every message, but after clicking Send the browser blocked the redirect back to the thank-you page, so the form looked stuck. Fixed the same day by allowing the site's own address in the Content-Security-Policy form-action rule.",
+      "impact": [
+        {
+          "label": "What failed",
+          "value": "The confirmation after sending: the page never changed and the fields kept their text"
+        },
+        {
+          "label": "Messages lost",
+          "value": "None. Every message was delivered"
+        },
+        {
+          "label": "Time to fix",
+          "value": "Same day"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "",
+          "event": "Contact form launched with Web3Forms and a strict Content-Security-Policy"
+        },
+        {
+          "time": "",
+          "event": "My own test message arrived by email, but the thank-you page never loaded"
+        },
+        {
+          "time": "",
+          "event": "Reproduced in a headless browser: Chrome blocked the redirect under form-action"
+        },
+        {
+          "time": "",
+          "event": "Fix: form-action allows the site itself as well as api.web3forms.com"
+        },
+        {
+          "time": "",
+          "event": "Verified in the browser, then shipped"
+        }
+      ],
+      "rootCause": "form-action listed only https://api.web3forms.com. Web3Forms answers the form post with a redirect to abhirupkhan.me/thanks.html, and Chrome checks every hop of a form's redirect chain against form-action. The site's own address was not on the list, so the last hop was blocked.",
+      "detection": "I caught it in my own launch test. Unit tests checked the policy text, but nothing ran a real browser submission.",
+      "wentWell": [
+        "No message was ever lost.",
+        "Reproducing it in a headless browser made the cause obvious and proved the fix."
+      ],
+      "wentBadly": [
+        "A strict policy was tested as text, not as behavior.",
+        "How form-action treats redirects is easy to miss."
+      ],
+      "actions": [
+        {
+          "action": "A test requires form-action to include the site itself whenever the form is on, with a comment explaining the redirect.",
+          "type": "Prevent"
+        },
+        {
+          "action": "Test new forms with a real browser submission before launch.",
+          "type": "Detect"
+        }
+      ],
+      "link": ""
+    }
+  ]
 }

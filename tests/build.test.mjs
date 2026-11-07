@@ -3,7 +3,7 @@ import { existsSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { build, esc, FORM_ENDPOINT, hasForm, render, renderCase, safeUrl, skillProof, terminalData, validate } from "../build.mjs";
+import { build, esc, FORM_ENDPOINT, hasForm, render, renderCase, renderPostmortem, renderPostmortemIndex, safeUrl, skillProof, terminalData, validate } from "../build.mjs";
 
 const content = JSON.parse(readFileSync(new URL("../content.json", import.meta.url), "utf8"));
 const copy = () => structuredClone(content);
@@ -149,7 +149,7 @@ test("outside links open in a new tab without giving it access to this page", ()
 
 test("the build writes the page, assets, domain, and 404 page", () => {
   const out = build(join(mkdtempSync(join(tmpdir(), "site-")), "_site"));
-  for (const file of ["index.html", "404.html", "thanks.html", "work/honest-fit.html", "assets/app.js", "assets/theme.js", "CNAME", "robots.txt", "assets/styles.css", "assets/favicon.svg", content.links.resume]) {
+  for (const file of ["index.html", "404.html", "thanks.html", "work/honest-fit.html", "postmortems/index.html", "postmortems/k6-flag-removed.html", "assets/app.js", "assets/theme.js", "CNAME", "robots.txt", "assets/styles.css", "assets/favicon.svg", content.links.resume]) {
     assert.ok(existsSync(join(out, file)), file);
   }
   assert.equal(readFileSync(join(out, "CNAME"), "utf8").trim(), "abhirupkhan.me");
@@ -303,4 +303,39 @@ test("the hidden terminal carries only public page facts as data, never as a scr
   const evil = copy();
   evil.intro = "</script><script>alert(1)</script>";
   assert.ok(!render(evil).includes("</script><script>alert(1)"));
+});
+
+test("postmortems get their own pages, newest first, with every part shown", () => {
+  const index = renderPostmortemIndex(content);
+  const dates = [...index.matchAll(/<time datetime="([0-9-]+)"/g)].map((m) => m[1]);
+  assert.deepEqual([...dates].sort().reverse(), dates);
+  for (const pm of content.postmortems) {
+    assert.ok(index.includes(`href="${pm.slug}.html"`), pm.slug);
+    const page = renderPostmortem(content, pm);
+    for (const part of [pm.title, pm.summary, pm.rootCause, pm.detection, ...pm.wentWell, ...pm.wentBadly]) {
+      assert.ok(page.includes(esc(part)), part.slice(0, 30));
+    }
+    for (const t of pm.timeline) assert.ok(page.includes(esc(t.event)), t.event.slice(0, 30));
+    for (const a of pm.actions) assert.ok(page.includes(`pm-type-${a.type.toLowerCase()}`));
+    assert.match(page, /script-src 'self'/);
+  }
+  const home = render(content);
+  assert.ok(home.includes('id="postmortems"'));
+  assert.ok(home.includes('href="postmortems/"'));
+});
+
+test("a postmortem needs every section, a real date, and known action types", () => {
+  const bad = copy();
+  bad.postmortems[0].date = "Nov 6";
+  bad.postmortems[1].actions = [{ action: "Do better", type: "Hope" }];
+  bad.postmortems[2].slug = bad.postmortems[0].slug;
+  delete bad.postmortems[2].rootCause;
+  const problems = validate(bad);
+  assert.ok(problems.includes("postmortems[0].date must be YYYY-MM-DD"));
+  assert.ok(problems.some((p) => p.startsWith("postmortems[1].actions type must be one of")));
+  assert.ok(problems.includes("postmortems[2].slug must be unique lowercase letters, numbers, and dashes"));
+  assert.ok(problems.includes("postmortems[2] needs title, system, severity, summary, rootCause, and detection"));
+  const none = copy();
+  delete none.postmortems;
+  assert.ok(!render(none).includes('id="postmortems"'));
 });

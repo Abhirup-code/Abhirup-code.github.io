@@ -89,6 +89,17 @@ export function validate(c) {
   for (const [skill, terms] of Object.entries(c?.skillMatch ?? {})) {
     need(Array.isArray(terms) && terms.length > 0 && terms.every(text), `skillMatch["${skill}"] must be a list of words to look for`);
   }
+  const seen = new Set();
+  for (const [i, pm] of (c?.postmortems ?? []).entries()) {
+    const at = `postmortems[${i}]`;
+    need(/^[a-z0-9-]+$/.test(pm.slug ?? "") && !seen.has(pm.slug), `${at}.slug must be unique lowercase letters, numbers, and dashes`);
+    seen.add(pm.slug);
+    need(/^\d{4}-\d{2}-\d{2}$/.test(pm.date ?? ""), `${at}.date must be YYYY-MM-DD`);
+    need(["title", "system", "severity", "summary", "rootCause", "detection"].every((k) => text(pm[k])), `${at} needs title, system, severity, summary, rootCause, and detection`);
+    need(["impact", "timeline", "wentWell", "wentBadly", "actions"].every((k) => Array.isArray(pm[k]) && pm[k].length), `${at} needs impact, timeline, wentWell, wentBadly, and actions`);
+    for (const a of pm.actions ?? []) need(ACTION_TYPES.includes(a.type), `${at}.actions type must be one of ${ACTION_TYPES.join(", ")}`);
+    if (pm.link) safeUrl(pm.link);
+  }
   const key = c?.contactForm?.accessKey ?? "";
   need(key === "" || ACCESS_KEY.test(key), "contactForm.accessKey must be the key Web3Forms emailed you (it looks like 8-4-4-4-12 letters and numbers)");
   // House style: no em dashes anywhere in the content.
@@ -106,6 +117,7 @@ export function validate(c) {
   return problems;
 }
 
+const ACTION_TYPES = ["Prevent", "Detect", "Mitigate", "Document"];
 const isExternal = (url) => url.startsWith("https://");
 const linkAttrs = (url) => (isExternal(url) ? ' target="_blank" rel="noopener noreferrer"' : "");
 
@@ -209,18 +221,20 @@ function projectDialog(p) {
   </dialog>`;
 }
 
-/** A full case study page for one project, at work/<slug>.html. */
-export function renderCase(c, p) {
-  const cs = p.caseStudy;
+/**
+ * The shell shared by pages one folder down (work/, postmortems/, lab/): head, menu bar, main.
+ * `path` is the page's address under the site root, used for the canonical link.
+ */
+function subpage(c, { title, description, path, body, back = "../#work", backLabel = "All work", scripts = [] }) {
   return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${esc(p.title)} · Case study · ${esc(c.name)}</title>
-<meta name="description" content="${esc(cs.problem)}">
+<title>${esc(title)} · ${esc(c.name)}</title>
+<meta name="description" content="${esc(description)}">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; script-src 'self'; base-uri 'none'; form-action 'none'">
-${c.url ? `<link rel="canonical" href="${esc(safeUrl(c.url).replace(/\/?$/, "/"))}${casePath(p)}">` : ""}
+${c.url ? `<link rel="canonical" href="${esc(safeUrl(c.url).replace(/\/?$/, "/"))}${esc(path)}">` : ""}
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <script src="../assets/theme.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -228,18 +242,32 @@ ${c.url ? `<link rel="canonical" href="${esc(safeUrl(c.url).replace(/\/?$/, "/")
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&amp;family=Inter:wght@400;500;600;700&amp;display=swap">
 <link rel="stylesheet" href="../assets/styles.css">
 <script src="../assets/app.js" defer></script>
+${scripts.map((src) => `<script src="../assets/${src}" defer></script>`).join("\n")}
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="nav wrap">
   <a class="brand" href="../">${esc(c.shortName ?? c.name)}</a>
   <nav aria-label="Site">
-    <a href="../#work">All work</a>
+    <a href="${back}">${esc(backLabel)}</a>
     ${themeToggle}
     <a class="pill magnetic" href="../${esc(safeUrl(c.links.resume))}">Resume ↗</a>
   </nav>
 </header>
-<main id="main" class="case wrap">
+${body}
+</body>
+</html>
+`;
+}
+
+/** A full case study page for one project, at work/<slug>.html. */
+export function renderCase(c, p) {
+  const cs = p.caseStudy;
+  return subpage(c, {
+    title: `${p.title} · Case study`,
+    description: cs.problem,
+    path: casePath(p),
+    body: `<main id="main" class="case wrap">
   <p class="eyebrow">Case study · ${esc(p.kicker ?? "")}</p>
   <h1>${esc(p.title)}</h1>
   <p class="case-lede">${esc(p.description)}</p>
@@ -249,9 +277,85 @@ ${c.url ? `<link rel="canonical" href="${esc(safeUrl(c.url).replace(/\/?$/, "/")
   <section class="case-section reveal"><h2>Results and quality</h2>${list(cs.results)}</section>
   <section class="case-section reveal"><h2>Tech</h2>${chips(cs.tech)}</section>
   <p class="case-back"><a class="btn btn-solid magnetic" href="../#work">← Back to all work</a></p>
-</main>
-</body>
-</html>
+</main>`,
+  });
+}
+
+const pmPath = (pm) => `postmortems/${pm.slug}.html`;
+const formatDate = (iso) =>
+  new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" });
+
+/** One blameless postmortem, at postmortems/<slug>.html. */
+export function renderPostmortem(c, pm) {
+  return subpage(c, {
+    title: `Postmortem: ${pm.title}`,
+    description: pm.summary,
+    path: pmPath(pm),
+    back: "./",
+    backLabel: "All postmortems",
+    body: `<main id="main" class="case postmortem wrap">
+  <p class="eyebrow">Postmortem · ${esc(pm.system)}</p>
+  <h1>${esc(pm.title)}</h1>
+  <p class="pm-meta"><time datetime="${esc(pm.date)}">${esc(formatDate(pm.date))}</time><span class="pm-sev">${esc(pm.severity)}</span><span>Blameless</span></p>
+  <p class="case-lede">${esc(pm.summary)}</p>
+  <section class="case-section"><h2>Impact</h2>
+    <dl class="pm-impact">${pm.impact.map((x) => `<div><dt>${esc(x.label)}</dt><dd>${esc(x.value)}</dd></div>`).join("")}</dl>
+  </section>
+  <section class="case-section"><h2>Timeline</h2>
+    <ol class="pm-timeline">${pm.timeline.map((t) => `<li>${t.time ? `<span class="pm-time">${esc(t.time)}</span>` : ""}<span>${esc(t.event)}</span></li>`).join("")}</ol>
+  </section>
+  <section class="case-section"><h2>Root cause</h2><p>${esc(pm.rootCause)}</p></section>
+  <section class="case-section"><h2>Detection</h2><p>${esc(pm.detection)}</p></section>
+  <section class="case-section pm-two"><div><h2>What went well</h2>${list(pm.wentWell)}</div><div><h2>What went badly</h2>${list(pm.wentBadly)}</div></section>
+  <section class="case-section"><h2>Action items</h2>
+    <ul class="pm-actions">${pm.actions.map((a) => `<li><span class="pm-type pm-type-${esc(a.type.toLowerCase())}">${esc(a.type)}</span>${esc(a.action)}</li>`).join("")}</ul>
+  </section>
+  <p class="case-back"><a class="btn btn-solid magnetic" href="./">← All postmortems</a>${pm.link ? ` <a class="btn magnetic" href="${esc(safeUrl(pm.link))}"${linkAttrs(pm.link)}>The project on GitHub ↗</a>` : ""}</p>
+</main>`,
+  });
+}
+
+const sortedPostmortems = (c) => [...(c.postmortems ?? [])].sort((a, b) => b.date.localeCompare(a.date));
+
+function pmCard(pm, prefix) {
+  return `
+      <li class="pm-card"><a href="${prefix}${esc(pm.slug)}.html">
+        <span class="pm-card-meta"><time datetime="${esc(pm.date)}">${esc(formatDate(pm.date))}</time> · ${esc(pm.system)} · ${esc(pm.severity)}</span>
+        <strong>${esc(pm.title)}</strong>
+        <span>${esc(pm.summary)}</span>
+      </a></li>`;
+}
+
+/** The list of postmortems, at postmortems/index.html. */
+export function renderPostmortemIndex(c) {
+  return subpage(c, {
+    title: "Postmortems",
+    description: "Blameless write-ups of what broke in my projects, how it was caught, and what changed after.",
+    path: "postmortems/",
+    back: "../#postmortems",
+    backLabel: "Home",
+    body: `<main id="main" class="case wrap">
+  <p class="eyebrow">Postmortems</p>
+  <h1>When things <em class="accent">broke.</em></h1>
+  <p class="case-lede">Blameless write-ups of real failures and drills in my projects: what happened, how it was caught, the root cause, and what changed after. Newest first.</p>
+  <ul class="pm-list">${sortedPostmortems(c).map((pm) => pmCard(pm, "")).join("")}
+  </ul>
+</main>`,
+  });
+}
+
+function postmortemSection(c) {
+  return `
+  <section class="postmortems wrap" id="postmortems" aria-labelledby="pm-heading">
+    <div class="section-head">
+      <span class="eyebrow">Postmortems</span>
+      <h2 id="pm-heading">When things <em>broke.</em></h2>
+      <p>Blameless write-ups of real failures and drills: how they were caught and what changed after.</p>
+      <p><a href="postmortems/">All postmortems →</a></p>
+    </div>
+    <ul class="pm-list">${sortedPostmortems(c).slice(0, 3).map((pm) => pmCard(pm, "postmortems/")).join("")}
+    </ul>
+  </section>
 `;
 }
 
@@ -505,7 +609,7 @@ ${(c.moreProjects ?? []).length ? `  <section class="more wrap" aria-labelledby=
     <ol class="timeline">${c.experience.map(job).join("")}
     </ol>
   </section>
-
+${(c.postmortems ?? []).length ? postmortemSection(c) : ""}
 ${(c.recommendations ?? []).length ? `  <section class="recs wrap" id="recommendations" aria-labelledby="recs-heading">
     <div class="section-head">
       <span class="eyebrow">Recommendations</span>
@@ -578,6 +682,11 @@ export function build(outDir = join(ROOT, "_site")) {
   mkdirSync(join(outDir, "work"), { recursive: true });
   for (const p of content.projects.filter((x) => x.caseStudy)) {
     writeFileSync(join(outDir, casePath(p)), renderCase(content, p));
+  }
+  if ((content.postmortems ?? []).length) {
+    mkdirSync(join(outDir, "postmortems"), { recursive: true });
+    writeFileSync(join(outDir, "postmortems", "index.html"), renderPostmortemIndex(content));
+    for (const pm of content.postmortems) writeFileSync(join(outDir, pmPath(pm)), renderPostmortem(content, pm));
   }
   cpSync(join(ROOT, "assets"), join(outDir, "assets"), { recursive: true });
   for (const file of ["404.html", "thanks.html", "CNAME", "robots.txt"]) {
