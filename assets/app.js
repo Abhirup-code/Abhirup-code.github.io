@@ -167,6 +167,51 @@
     window.setInterval(tick, 9000);
   });
 
+  /* ---------- This site's own SLO, from the scheduled uptime check ---------- */
+  // Filled in by the badge below, and read by the terminal's `uptime` command.
+  var siteSlo = { text: "", state: "loading" };
+  var sloBadge = document.querySelector(".site-slo");
+
+  // Rounds down, so 99.996% never shows as a perfect 100.00%.
+  function pct(x, digits) { var f = Math.pow(10, digits); return (Math.floor(x * 100 * f) / f).toFixed(digits) + "%"; }
+  function ago(iso) {
+    var mins = Math.max(0, Math.round((Date.now() - Date.parse(iso)) / 60000));
+    if (mins < 60) return mins + " min ago";
+    var hours = Math.round(mins / 60);
+    return hours < 48 ? hours + " h ago" : Math.round(hours / 24) + " days ago";
+  }
+  function describeSlo(s) {
+    var fresh = Date.now() - Date.parse(s.lastCheck) < 2 * 3600000;
+    var state = !fresh ? "stale" : s.budgetLeft > 0.25 ? "ok" : s.budgetLeft > 0 ? "warn" : "bad";
+    var text;
+    if (s.checks < 96) {
+      // Under a day of checks: show the raw count, not a percentage that means little yet.
+      var since = new Date(s.since + "T12:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+      text = "This site's uptime: " + s.good + " of " + s.checks + " checks passed since " + since;
+    } else {
+      text = "This site: " + pct(s.availability, 2) + " up over " + s.windowDays + " days · error budget " +
+        pct(Math.max(s.budgetLeft, 0), 0) + " left";
+    }
+    return { text: text + " · checked " + ago(s.lastCheck), state: state };
+  }
+  function validSummary(s) {
+    return s && typeof s.checks === "number" && s.checks > 0 && typeof s.good === "number" &&
+      typeof s.availability === "number" && typeof s.budgetLeft === "number" &&
+      typeof s.windowDays === "number" && !isNaN(Date.parse(s.lastCheck)) && /^\d{4}-\d{2}-\d{2}$/.test(s.since);
+  }
+  if (sloBadge && window.fetch) {
+    fetch(sloBadge.getAttribute("data-status-url"), { cache: "no-cache" })
+      .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+      .then(function (data) {
+        if (!validSummary(data.summary)) throw new Error("No usable data yet");
+        siteSlo = describeSlo(data.summary);
+        sloBadge.querySelector(".slo-text").textContent = siteSlo.text;
+        sloBadge.className = "site-slo slo-" + siteSlo.state;
+        sloBadge.hidden = false;
+      })
+      .catch(function () { siteSlo = { text: "", state: "unavailable" }; }); // the badge just stays hidden
+  }
+
   /* ---------- Hidden terminal: the footer button or the ` key opens it ---------- */
   var term = document.getElementById("terminal");
   var dataEl = document.getElementById("site-data");
@@ -379,6 +424,14 @@
         about: "",
         hidden: true,
         run: function () { history.forEach(function (h, i) { line("  " + (i + 1) + "  " + h); }); }
+      },
+      uptime: {
+        about: "this site's own SLO",
+        run: function () {
+          if (siteSlo.text) line(siteSlo.text);
+          else line(siteSlo.state === "loading" ? "Still loading the uptime data. Try again in a second." : "Uptime data is not available right now.", "t-dim");
+          line("Checked every 15 minutes by a GitHub Action against a 99.9% objective.", "t-dim");
+        }
       },
       clear: {
         about: "clear the screen",

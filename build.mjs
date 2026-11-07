@@ -89,6 +89,10 @@ export function validate(c) {
   for (const [skill, terms] of Object.entries(c?.skillMatch ?? {})) {
     need(Array.isArray(terms) && terms.length > 0 && terms.every(text), `skillMatch["${skill}"] must be a list of words to look for`);
   }
+  if (c?.siteSlo) {
+    need(/^https:\/\/raw\.githubusercontent\.com\/[\w./-]+\.json$/.test(c.siteSlo.statusUrl ?? ""), "siteSlo.statusUrl must be a raw.githubusercontent.com JSON file");
+    if (c.siteSlo.about) safeUrl(c.siteSlo.about);
+  }
   const seen = new Set();
   for (const [i, pm] of (c?.postmortems ?? []).entries()) {
     const at = `postmortems[${i}]`;
@@ -527,6 +531,12 @@ function provenance(meta) {
   return `<span class="provenance">Built by GitHub Actions from commit <a href="${esc(repoUrl)}/commit/${esc(meta.sha)}"${linkAttrs(repoUrl)}><code>${esc(meta.sha.slice(0, 7))}</code></a> and signed. <a href="${esc(repoUrl)}#verify-this-site"${linkAttrs(repoUrl)}>Verify it yourself ↗</a></span>`;
 }
 
+/** A live badge with this site's own uptime SLO. Hidden until app.js has real numbers. */
+function siteSloBadge(slo) {
+  const about = slo.about ? ` <a class="slo-about" href="${esc(safeUrl(slo.about))}"${linkAttrs(slo.about)}>How it's measured ↗</a>` : "";
+  return `<p class="site-slo" data-status-url="${esc(slo.statusUrl)}" hidden><span class="slo-dot" aria-hidden="true"></span><span class="slo-text"></span>${about}</p>`;
+}
+
 export function render(c, meta = {}) {
   const problems = validate(c);
   if (problems.length) throw new Error(`content.json has problems:\n- ${problems.join("\n- ")}`);
@@ -555,7 +565,7 @@ export function render(c, meta = {}) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(c.name)} · ${esc(c.role)}</title>
 <meta name="description" content="${esc(c.description ?? c.intro)}">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; script-src 'self'; base-uri 'none'; form-action ${hasForm(c) ? `'self' ${FORM_ENDPOINT_ORIGIN}` : "'none'"}">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; script-src 'self';${c.siteSlo ? " connect-src 'self' https://raw.githubusercontent.com;" : ""} base-uri 'none'; form-action ${hasForm(c) ? `'self' ${FORM_ENDPOINT_ORIGIN}` : "'none'"}">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 ${c.url ? `<link rel="canonical" href="${esc(safeUrl(c.url))}">` : ""}
 <meta property="og:title" content="${esc(c.name)} · ${esc(c.role)}">
@@ -590,6 +600,7 @@ ${c.url ? `<meta property="og:url" content="${esc(safeUrl(c.url))}">` : ""}
     <p class="intro">${esc(c.intro)}</p>
     ${roleLine(c)}
     ${c.quickView ? `<p class="hero-cta"><a class="btn btn-solid magnetic" href="#contact" data-dialog="dlg-quick">Quick facts</a></p>` : ""}
+    ${c.siteSlo ? siteSloBadge(c.siteSlo) : ""}
     <div class="hero-art${photo ? " has-photo" : ""}">${photo}
       <svg class="badge" viewBox="0 0 168 168" role="img" aria-label="${esc(c.badge.replaceAll("·", ",").replace(/[,\s]+$/, ""))}">
         <defs><path id="badge-circle" d="M84,84 m-60,0 a60,60 0 1,1 120,0 a60,60 0 1,1 -120,0"></path></defs>

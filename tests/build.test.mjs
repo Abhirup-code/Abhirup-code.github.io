@@ -353,3 +353,16 @@ test("CI builds name their commit in the footer; local builds do not", () => {
   assert.deepEqual(buildMeta({ GITHUB_SHA: '"><script>', GITHUB_REPOSITORY: "a/b" }), {});
   assert.deepEqual(buildMeta({ GITHUB_SHA: sha, GITHUB_REPOSITORY: "a/b/../c" }), {});
 });
+
+test("the site's own SLO badge waits for real data and may only fetch from GitHub", () => {
+  const html = render(content);
+  assert.match(html, /<p class="site-slo" data-status-url="https:\/\/raw\.githubusercontent\.com\/[^"]+\/status\.json" hidden>/);
+  assert.match(html, /connect-src 'self' https:\/\/raw\.githubusercontent\.com;/);
+  const none = copy();
+  delete none.siteSlo;
+  assert.ok(!render(none).includes("site-slo"));
+  assert.ok(!render(none).includes("connect-src"));
+  const bad = copy();
+  bad.siteSlo.statusUrl = "https://evil.example/status.json";
+  assert.ok(validate(bad).includes("siteSlo.statusUrl must be a raw.githubusercontent.com JSON file"));
+});
