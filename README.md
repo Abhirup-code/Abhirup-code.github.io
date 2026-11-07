@@ -31,6 +31,23 @@ python3 -m http.server -d _site 8000
 
 Then open http://localhost:8000.
 
+## Verify this site
+
+Every deploy is signed. GitHub Actions builds the site, then creates a signed
+[build provenance attestation](https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations)
+for every file it is about to publish. The footer of the live site shows which commit it was built from.
+
+To check that the page you are looking at really came from this repository's CI, unchanged,
+with the [GitHub CLI](https://cli.github.com/):
+
+```bash
+curl -sO https://abhirupkhan.me/index.html
+gh attestation verify index.html --repo Abhirup-code/Abhirup-code.github.io
+```
+
+A match prints `✓ Verification succeeded!` with the workflow and commit that built it. Any other
+file works the same way, for example `assets/styles.css`.
+
 ## How it is built
 
 | | |

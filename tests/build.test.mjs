@@ -3,7 +3,7 @@ import { existsSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { build, esc, FORM_ENDPOINT, hasForm, render, renderCase, renderPostmortem, renderPostmortemIndex, safeUrl, skillProof, terminalData, validate } from "../build.mjs";
+import { build, buildMeta, esc, FORM_ENDPOINT, hasForm, render, renderCase, renderPostmortem, renderPostmortemIndex, safeUrl, skillProof, terminalData, validate } from "../build.mjs";
 
 const content = JSON.parse(readFileSync(new URL("../content.json", import.meta.url), "utf8"));
 const copy = () => structuredClone(content);
@@ -338,4 +338,18 @@ test("a postmortem needs every section, a real date, and known action types", ()
   const none = copy();
   delete none.postmortems;
   assert.ok(!render(none).includes('id="postmortems"'));
+});
+
+test("CI builds name their commit in the footer; local builds do not", () => {
+  const sha = "0123456789abcdef0123456789abcdef01234567";
+  const meta = buildMeta({ GITHUB_SHA: sha, GITHUB_REPOSITORY: "Abhirup-code/Abhirup-code.github.io" });
+  assert.deepEqual(meta, { sha, repo: "Abhirup-code/Abhirup-code.github.io" });
+  const html = render(content, meta);
+  assert.ok(html.includes(`/commit/${sha}"`));
+  assert.ok(html.includes("<code>0123456</code>"));
+  assert.ok(html.includes("#verify-this-site"));
+  assert.ok(!render(content).includes('class="provenance"'));
+  // Anything odd in the environment is ignored rather than written into the page.
+  assert.deepEqual(buildMeta({ GITHUB_SHA: '"><script>', GITHUB_REPOSITORY: "a/b" }), {});
+  assert.deepEqual(buildMeta({ GITHUB_SHA: sha, GITHUB_REPOSITORY: "a/b/../c" }), {});
 });
