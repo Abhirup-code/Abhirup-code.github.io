@@ -629,27 +629,13 @@ function roleLine(c) {
   return `<p class="role"><span class="sr-only">Open to roles in ${esc(roles.join(", "))}</span><span class="role-static" aria-hidden="true">${esc(c.role)}</span><span class="role-anim" aria-hidden="true">Open to roles in <span class="rotator rotator-${Math.min(roles.length, 5)}"><span class="rotator-track">${[...roles, roles[0]].map((r) => `<span>${esc(r)}</span>`).join("")}</span></span></span></p>`;
 }
 
-/** Where this build came from, when GitHub Actions built it. Empty for local builds. */
-export function buildMeta(env = process.env) {
-  const sha = env.GITHUB_SHA ?? "";
-  const repo = env.GITHUB_REPOSITORY ?? "";
-  if (!/^[0-9a-f]{40}$/.test(sha) || !/^[\w.-]+\/[\w.-]+$/.test(repo)) return {};
-  return { sha, repo };
-}
-
-function provenance(meta) {
-  if (!meta.sha) return "";
-  const repoUrl = `https://github.com/${meta.repo}`;
-  return `<span class="provenance">Built by GitHub Actions from commit <a href="${esc(repoUrl)}/commit/${esc(meta.sha)}"${linkAttrs(repoUrl)}><code>${esc(meta.sha.slice(0, 7))}</code></a> and signed. <a href="${esc(repoUrl)}#verify-this-site"${linkAttrs(repoUrl)}>Verify it yourself ↗</a></span>`;
-}
-
 /** A live badge with this site's own uptime SLO. Hidden until app.js has real numbers. */
 function siteSloBadge(slo) {
   const about = slo.about ? ` <a class="slo-about" href="${esc(safeUrl(slo.about))}"${linkAttrs(slo.about)}>How it's measured ↗</a>` : "";
   return `<p class="site-slo" data-status-url="${esc(slo.statusUrl)}" hidden><span class="slo-dot" aria-hidden="true"></span><span class="slo-text"></span>${about}</p>`;
 }
 
-export function render(c, meta = {}) {
+export function render(c) {
   const problems = validate(c);
   if (problems.length) throw new Error(`content.json has problems:\n- ${problems.join("\n- ")}`);
   const L = c.links;
@@ -802,7 +788,7 @@ ${(c.awards ?? []).length ? `
       ${L.resume ? `<li><a class="magnetic" href="${esc(safeUrl(L.resume))}">Resume ↗</a></li>` : ""}
     </ul>
     ${hasForm(c) ? contactForm(c) : ""}
-    <p class="fine">© ${new Date().getFullYear()} ${esc(c.name)}${provenance(meta)}<button class="term-open" type="button" hidden><span aria-hidden="true">&gt;_</span> Open terminal</button></p>
+    <p class="fine">© ${new Date().getFullYear()} ${esc(c.name)}<button class="term-open" type="button" hidden><span aria-hidden="true">&gt;_</span> Open terminal</button></p>
   </div>
 </footer>${terminal(c)}
 </body>
@@ -812,7 +798,7 @@ ${(c.awards ?? []).length ? `
 
 export function build(outDir = join(ROOT, "_site")) {
   const content = JSON.parse(readFileSync(join(ROOT, "content.json"), "utf8"));
-  const html = render(content, buildMeta());
+  const html = render(content);
   rmSync(outDir, { recursive: true, force: true });
   mkdirSync(outDir, { recursive: true });
   writeFileSync(join(outDir, "index.html"), html);

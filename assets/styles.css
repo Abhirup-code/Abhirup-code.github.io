@@ -446,8 +446,6 @@ button.btn { font: 600 16px var(--sans); cursor: pointer; }
 .contact-form button:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
 .form-note { margin: 0; font-size: 13px !important; color: var(--muted); }
 .hp { display: none; }
-.provenance a { color: #ffffff; }
-.provenance code { font: 600 13px ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
 .contact .fine { margin-top: 48px; font-size: 14px; color: #ffedd5; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
 .term-open { font: 600 13px ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: #ffffff; background: transparent; border: 1.5px dashed #ffffff; border-radius: 8px; padding: 6px 10px; min-height: 32px; cursor: pointer; }
 .term-open:hover { background: #ffffff; color: var(--dark-text); border-style: solid; }

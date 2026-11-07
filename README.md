@@ -58,7 +58,7 @@ alert tests: a full outage pages in about 4.5 minutes, and a 2% leak opens a tic
 
 Every deploy is signed. GitHub Actions builds the site, then creates a signed
 [build provenance attestation](https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations)
-for every file it is about to publish. The footer of the live site shows which commit it was built from.
+for every file it is about to publish.
 
 To check that the page you are looking at really came from this repository's CI, unchanged,
 with the [GitHub CLI](https://cli.github.com/):
@@ -81,7 +81,7 @@ file works the same way, for example `assets/styles.css`.
 | Motion | A skills ticker, a spinning badge, a rotating role line, hover lift on projects, magnetic buttons, a timeline that draws itself as you scroll, and sections that rise into place; all motion stops for people who turn on reduced motion |
 | Interactive | Project pop-ups with a short case study, full case study pages under `work/`, a recommendations carousel with pause and previous/next controls, and a dark mode that follows the system setting or a saved choice. A quick facts pop-up, skills that open a list of where each was used, and a hidden terminal (the footer button or the ` key; try `help`). Everything still works without JavaScript: tiles link to the case study pages, skill lists open as plain disclosures, and recommendations stack |
 | Reliability | A 99.9% uptime SLO measured every 15 minutes and shown live on the home page, public blameless postmortems under `postmortems/`, and an interactive error budget lab under `lab/` |
-| Supply chain | Every published file carries a signed build provenance attestation; the footer names the source commit |
+| Supply chain | Every published file carries a signed build provenance attestation |
 | Accessibility | axe-core finds no WCAG 2.1 AA issues at desktop and phone sizes in light and dark mode, including with a pop-up open and on the case study pages; skip link, focus outlines, focus returns after closing a pop-up, and the carousel never auto-plays for reduced-motion users |
 | Tests | `node --test` checks the content, escaping, allowed links, page order, and build output |
 | Deploy | GitHub Actions runs the tests, builds, and publishes to GitHub Pages on every push to `main`. Every action is pinned to a commit SHA and the workflow token is read-only except for the deploy step |
