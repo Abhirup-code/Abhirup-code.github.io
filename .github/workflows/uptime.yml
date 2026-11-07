@@ -1,0 +1,43 @@
+name: Uptime check
+
+# Checks the live site every 15 minutes and keeps 30 days of results on the uptime-data
+# branch. The home page reads that file to show the site's own availability and error budget.
+on:
+  schedule:
+    - cron: "4,19,34,49 * * * *" # off the top of the hour, when GitHub's scheduler is busiest
+  workflow_dispatch:
+
+permissions:
+  contents: write # to update the uptime-data branch
+
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+      - name: Open the uptime-data branch (created on the first run)
+        run: |
+          if git fetch --depth 1 origin uptime-data; then
+            git worktree add -B uptime-data data FETCH_HEAD
+          else
+            git worktree add --orphan -b uptime-data data
+          fi
+      - name: Check the live site
+        run: node scripts/uptime.mjs --url https://abhirupkhan.me/ --expect "Abhirup Khan" --data data/status.json
+      - name: Save the result
+        working-directory: data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add status.json
+          # Keep the branch at one commit: the file holds the history, git does not need to.
+          git commit --quiet --amend -m "Uptime data" || git commit --quiet -m "Uptime data"
+          git push --quiet --force origin HEAD:uptime-data
