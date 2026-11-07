@@ -761,5 +761,6 @@
   "siteSlo": {
     "statusUrl": "https://raw.githubusercontent.com/Abhirup-code/Abhirup-code.github.io/uptime-data/status.json",
     "about": "https://github.com/Abhirup-code/Abhirup-code.github.io/blob/main/.github/workflows/uptime.yml"
-  }
+  },
+  "lab": true
 }

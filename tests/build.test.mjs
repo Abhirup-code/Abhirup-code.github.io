@@ -3,7 +3,7 @@ import { existsSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { build, buildMeta, esc, FORM_ENDPOINT, hasForm, render, renderCase, renderPostmortem, renderPostmortemIndex, safeUrl, skillProof, terminalData, validate } from "../build.mjs";
+import { build, buildMeta, esc, FORM_ENDPOINT, hasForm, render, renderCase, renderLab, renderPostmortem, renderPostmortemIndex, safeUrl, skillProof, terminalData, validate } from "../build.mjs";
 
 const content = JSON.parse(readFileSync(new URL("../content.json", import.meta.url), "utf8"));
 const copy = () => structuredClone(content);
@@ -149,7 +149,7 @@ test("outside links open in a new tab without giving it access to this page", ()
 
 test("the build writes the page, assets, domain, and 404 page", () => {
   const out = build(join(mkdtempSync(join(tmpdir(), "site-")), "_site"));
-  for (const file of ["index.html", "404.html", "thanks.html", "work/honest-fit.html", "postmortems/index.html", "postmortems/k6-flag-removed.html", "assets/app.js", "assets/theme.js", "CNAME", "robots.txt", "assets/styles.css", "assets/favicon.svg", content.links.resume]) {
+  for (const file of ["index.html", "404.html", "thanks.html", "work/honest-fit.html", "postmortems/index.html", "postmortems/k6-flag-removed.html", "lab/index.html", "assets/slo-sim.js", "assets/lab.js", "assets/app.js", "assets/theme.js", "CNAME", "robots.txt", "assets/styles.css", "assets/favicon.svg", content.links.resume]) {
     assert.ok(existsSync(join(out, file)), file);
   }
   assert.equal(readFileSync(join(out, "CNAME"), "utf8").trim(), "abhirupkhan.me");
@@ -365,4 +365,17 @@ test("the site's own SLO badge waits for real data and may only fetch from GitHu
   const bad = copy();
   bad.siteSlo.statusUrl = "https://evil.example/status.json";
   assert.ok(validate(bad).includes("siteSlo.statusUrl must be a raw.githubusercontent.com JSON file"));
+});
+
+test("the lab page loads only its own scripts and works as a plain page without them", () => {
+  const html = renderLab(content);
+  assert.ok(html.includes('<script src="../assets/slo-sim.js" defer></script>'));
+  assert.ok(html.includes('<script src="../assets/lab.js" defer></script>'));
+  assert.ok(html.includes('<div class="lab-grid" hidden>'));
+  assert.ok(html.includes("<noscript>"));
+  assert.ok(!/\sstyle="/.test(html));
+  assert.ok(render(content).includes('href="lab/"'));
+  const none = copy();
+  delete none.lab;
+  assert.ok(!render(none).includes('id="lab"'));
 });

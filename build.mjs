@@ -348,6 +348,118 @@ export function renderPostmortemIndex(c) {
   });
 }
 
+/** The "Break my service" lab, at lab/index.html. Runs entirely in the browser. */
+export function renderLab(c) {
+  return subpage(c, {
+    title: "Lab: break my service",
+    description: "A simulated checkout service with real SLOs, burn-rate alerts, and an error budget deploy gate. Turn up the errors and watch what happens.",
+    path: "lab/",
+    back: "../#lab",
+    backLabel: "Home",
+    scripts: ["slo-sim.js", "lab.js"],
+    body: `<main id="main" class="lab wrap">
+  <p class="eyebrow">Lab</p>
+  <h1>Break my <em class="accent">service.</em></h1>
+  <p class="case-lede">A simulated checkout service with the same 99.5% SLO, burn-rate alerts, and deploy gate as my
+  <a href="https://github.com/Abhirup-code/Burn_Rate" target="_blank" rel="noopener noreferrer">Burn_Rate</a> project. Turn up the errors and watch the
+  error budget burn, the alerts fire, and the deploy gate decide. It starts with 3 healthy days of history.</p>
+  <noscript><p class="lab-noscript">The lab runs in your browser and needs JavaScript.</p></noscript>
+
+  <div class="lab-grid" hidden>
+    <section class="lab-card lab-controls" aria-labelledby="lab-controls-h">
+      <h2 id="lab-controls-h">Controls</h2>
+      <label class="lab-label" for="lab-errors">Failing checkouts: <output id="lab-errors-out" for="lab-errors">0%</output></label>
+      <input id="lab-errors" type="range" min="0" max="100" step="0.5" value="0">
+      <div class="lab-presets" role="group" aria-label="Scenarios">
+        <button type="button" class="btn" data-rate="0">Healthy</button>
+        <button type="button" class="btn" data-rate="2">Slow leak (2%)</button>
+        <button type="button" class="btn" data-rate="20">Bad deploy (20%)</button>
+        <button type="button" class="btn" data-rate="100">Full outage</button>
+      </div>
+      <fieldset class="lab-speed">
+        <legend>Speed (simulated time per real second)</legend>
+        <label><input type="radio" name="lab-speed" value="1" checked> 1 minute</label>
+        <label><input type="radio" name="lab-speed" value="10"> 10 minutes</label>
+        <label><input type="radio" name="lab-speed" value="60"> 1 hour</label>
+      </fieldset>
+      <div class="lab-run">
+        <button type="button" class="btn btn-solid" id="lab-pause">Pause</button>
+        <button type="button" class="btn" id="lab-reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="lab-card lab-status" aria-labelledby="lab-status-h">
+      <h2 id="lab-status-h">Service status <span class="lab-clock" id="lab-clock"></span></h2>
+      <dl class="lab-numbers">
+        <div><dt>Error budget left (30 days)</dt><dd id="lab-budget">100%</dd></div>
+        <div><dt>Burn rate (5 minutes)</dt><dd id="lab-burn">0</dd></div>
+        <div><dt>Failing right now</dt><dd id="lab-ratio">0%</dd></div>
+      </dl>
+      <div class="lab-meter" aria-hidden="true"><span id="lab-meter-fill"></span></div>
+      <div class="lab-alerts">
+        <span class="lab-alert" id="lab-page"><b>Page</b> <span>quiet</span></span>
+        <span class="lab-alert" id="lab-ticket"><b>Ticket</b> <span>quiet</span></span>
+      </div>
+      <figure class="lab-chart">
+        <svg viewBox="0 0 600 200" role="img" aria-labelledby="lab-chart-cap" preserveAspectRatio="none">
+          <line class="lab-th lab-th-1" x1="0" x2="600" y1="0" y2="0"></line>
+          <line class="lab-th lab-th-6" x1="0" x2="600" y1="0" y2="0"></line>
+          <line class="lab-th lab-th-14" x1="0" x2="600" y1="0" y2="0"></line>
+          <polyline id="lab-line" points=""></polyline>
+        </svg>
+        <figcaption id="lab-chart-cap">Burn rate over the last 3 simulated hours. Dashed lines: 1 (ticket over days), 6 and 14.4 (page).</figcaption>
+      </figure>
+    </section>
+
+    <section class="lab-card lab-gate" aria-labelledby="lab-gate-h">
+      <h2 id="lab-gate-h">Deploy gate</h2>
+      <p>Features ship only while there is error budget left. A fix can always ship, with a reason on record.</p>
+      <button type="button" class="btn btn-solid" id="lab-ship">Ship a feature</button>
+      <form class="lab-hotfix" id="lab-hotfix">
+        <label class="lab-label" for="lab-reason">Hotfix reason</label>
+        <input id="lab-reason" type="text" maxlength="120" placeholder="Roll back the bad config" autocomplete="off">
+        <button type="submit" class="btn">Ship a hotfix</button>
+      </form>
+      <p class="lab-verdict" id="lab-verdict" role="status"></p>
+    </section>
+
+    <section class="lab-card lab-log" aria-labelledby="lab-log-h">
+      <h2 id="lab-log-h">What happened</h2>
+      <ol id="lab-events" aria-live="polite"></ol>
+    </section>
+  </div>
+
+  <section class="case-section"><h2>How the alerts decide</h2>
+    <p>Each alert checks a long window to prove the problem is real and a short one to prove it is still happening.</p>
+    <table class="lab-table">
+      <thead><tr><th scope="col">Severity</th><th scope="col">Burn rate</th><th scope="col">Long window</th><th scope="col">Short window</th></tr></thead>
+      <tbody>
+        <tr><td>Page</td><td>14.4x</td><td>1 hour</td><td>5 minutes</td></tr>
+        <tr><td>Page</td><td>6x</td><td>6 hours</td><td>30 minutes</td></tr>
+        <tr><td>Ticket</td><td>3x</td><td>1 day</td><td>2 hours</td></tr>
+        <tr><td>Ticket</td><td>1x</td><td>3 days</td><td>6 hours</td></tr>
+      </tbody>
+    </table>
+    <p>Try a full outage: it pages after about 4.5 minutes and spends the month's budget in about 22. Then try a 2% leak at
+    1 hour per second: no page, ever, but a ticket after about 18 hours.</p>
+  </section>
+</main>`,
+  });
+}
+
+function labSection() {
+  return `
+  <section class="lab-teaser wrap" id="lab" aria-labelledby="lab-heading">
+    <div>
+      <span class="eyebrow">Lab</span>
+      <h2 id="lab-heading">Break my <em>service.</em></h2>
+      <p>A live simulation of a checkout service with real SLOs. Turn up the errors, watch the error budget burn and the alerts fire, then try to ship a feature past the deploy gate.</p>
+    </div>
+    <a class="btn btn-solid magnetic" href="lab/">Open the lab →</a>
+  </section>
+`;
+}
+
 function postmortemSection(c) {
   return `
   <section class="postmortems wrap" id="postmortems" aria-labelledby="pm-heading">
@@ -634,7 +746,7 @@ ${(c.moreProjects ?? []).length ? `  <section class="more wrap" aria-labelledby=
     <ol class="timeline">${c.experience.map(job).join("")}
     </ol>
   </section>
-${(c.postmortems ?? []).length ? postmortemSection(c) : ""}
+${c.lab ? labSection() : ""}${(c.postmortems ?? []).length ? postmortemSection(c) : ""}
 ${(c.recommendations ?? []).length ? `  <section class="recs wrap" id="recommendations" aria-labelledby="recs-heading">
     <div class="section-head">
       <span class="eyebrow">Recommendations</span>
@@ -707,6 +819,10 @@ export function build(outDir = join(ROOT, "_site")) {
   mkdirSync(join(outDir, "work"), { recursive: true });
   for (const p of content.projects.filter((x) => x.caseStudy)) {
     writeFileSync(join(outDir, casePath(p)), renderCase(content, p));
+  }
+  if (content.lab) {
+    mkdirSync(join(outDir, "lab"), { recursive: true });
+    writeFileSync(join(outDir, "lab", "index.html"), renderLab(content));
   }
   if ((content.postmortems ?? []).length) {
     mkdirSync(join(outDir, "postmortems"), { recursive: true });
