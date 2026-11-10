@@ -629,12 +629,6 @@ function roleLine(c) {
   return `<p class="role"><span class="sr-only">Open to roles in ${esc(roles.join(", "))}</span><span class="role-static" aria-hidden="true">${esc(c.role)}</span><span class="role-anim" aria-hidden="true">Open to roles in <span class="rotator rotator-${Math.min(roles.length, 5)}"><span class="rotator-track">${[...roles, roles[0]].map((r) => `<span>${esc(r)}</span>`).join("")}</span></span></span></p>`;
 }
 
-/** A live badge with this site's own uptime SLO. Hidden until app.js has real numbers. */
-function siteSloBadge(slo) {
-  const about = slo.about ? ` <a class="slo-about" href="${esc(safeUrl(slo.about))}"${linkAttrs(slo.about)}>How it's measured ↗</a>` : "";
-  return `<p class="site-slo" data-status-url="${esc(slo.statusUrl)}" hidden><span class="slo-dot" aria-hidden="true"></span><span class="slo-text"></span>${about}</p>`;
-}
-
 export function render(c) {
   const problems = validate(c);
   if (problems.length) throw new Error(`content.json has problems:\n- ${problems.join("\n- ")}`);
@@ -693,12 +687,11 @@ ${c.url ? `<meta property="og:url" content="${esc(safeUrl(c.url))}">` : ""}
 </header>
 <div class="ticker" aria-hidden="true"><div class="ticker-track"><span>${ticker}</span><span>${ticker}</span></div></div>
 <main id="main">
-  <section class="hero wrap" id="top">
+  <section class="hero wrap" id="top"${c.siteSlo ? ` data-slo-url="${esc(c.siteSlo.statusUrl)}"` : ""}>
     <h1><span class="name-first">${esc(first)}</span> <span class="name-last">${esc(rest.join(" "))}.</span></h1>
     <p class="intro">${esc(c.intro)}</p>
     ${roleLine(c)}
     ${c.quickView ? `<p class="hero-cta"><a class="btn btn-solid magnetic" href="#contact" data-dialog="dlg-quick">Quick facts</a></p>` : ""}
-    ${c.siteSlo ? siteSloBadge(c.siteSlo) : ""}
     <div class="hero-art${photo ? " has-photo" : ""}">${photo}
       <svg class="badge" viewBox="0 0 168 168" role="img" aria-label="${esc(c.badge.replaceAll("·", ",").replace(/[,\s]+$/, ""))}">
         <defs><path id="badge-circle" d="M84,84 m-60,0 a60,60 0 1,1 120,0 a60,60 0 1,1 -120,0"></path></defs>

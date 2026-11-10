@@ -168,9 +168,9 @@
   });
 
   /* ---------- This site's own SLO, from the scheduled uptime check ---------- */
-  // Filled in by the badge below, and read by the terminal's `uptime` command.
-  var siteSlo = { text: "", state: "loading" };
-  var sloBadge = document.querySelector(".site-slo");
+  // Only the terminal's `uptime` command shows it, and the data is fetched the first time it runs.
+  var hero = document.querySelector("[data-slo-url]");
+  var sloUrl = hero && hero.getAttribute("data-slo-url");
 
   // Rounds down, so 99.996% never shows as a perfect 100.00%.
   function pct(x, digits) { var f = Math.pow(10, digits); return (Math.floor(x * 100 * f) / f).toFixed(digits) + "%"; }
@@ -199,17 +199,16 @@
       typeof s.availability === "number" && typeof s.budgetLeft === "number" &&
       typeof s.windowDays === "number" && !isNaN(Date.parse(s.lastCheck)) && /^\d{4}-\d{2}-\d{2}$/.test(s.since);
   }
-  if (sloBadge && window.fetch) {
-    fetch(sloBadge.getAttribute("data-status-url"), { cache: "no-cache" })
+  /** Calls done(text) with the latest uptime summary, or done("") if there is none. */
+  function loadSlo(done) {
+    if (!sloUrl || !window.fetch) { done(""); return; }
+    fetch(sloUrl, { cache: "no-cache" })
       .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function (data) {
         if (!validSummary(data.summary)) throw new Error("No usable data yet");
-        siteSlo = describeSlo(data.summary);
-        sloBadge.querySelector(".slo-text").textContent = siteSlo.text;
-        sloBadge.className = "site-slo slo-" + siteSlo.state;
-        sloBadge.hidden = false;
+        done(describeSlo(data.summary).text);
       })
-      .catch(function () { siteSlo = { text: "", state: "unavailable" }; }); // the badge just stays hidden
+      .catch(function () { done(""); });
   }
 
   /* ---------- Hidden terminal: the footer button or the ` key opens it ---------- */
@@ -428,9 +427,11 @@
       uptime: {
         about: "this site's own SLO",
         run: function () {
-          if (siteSlo.text) line(siteSlo.text);
-          else line(siteSlo.state === "loading" ? "Still loading the uptime data. Try again in a second." : "Uptime data is not available right now.", "t-dim");
-          line("Checked every 15 minutes by a GitHub Action against a 99.9% objective.", "t-dim");
+          line("Checking...", "t-dim");
+          loadSlo(function (text) {
+            line(text || "Uptime data is not available right now.", text ? "" : "t-dim");
+            line("Checked every 15 minutes by a GitHub Action against a 99.9% objective.", "t-dim");
+          });
         }
       },
       clear: {

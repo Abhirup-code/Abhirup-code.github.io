@@ -340,13 +340,14 @@ test("a postmortem needs every section, a real date, and known action types", ()
   assert.ok(!render(none).includes('id="postmortems"'));
 });
 
-test("the site's own SLO badge waits for real data and may only fetch from GitHub", () => {
+test("the uptime data stays off the page, for the terminal only, and may only be fetched from GitHub", () => {
   const html = render(content);
-  assert.match(html, /<p class="site-slo" data-status-url="https:\/\/raw\.githubusercontent\.com\/[^"]+\/status\.json" hidden>/);
+  assert.match(html, /<section class="hero wrap" id="top" data-slo-url="https:\/\/raw\.githubusercontent\.com\/[^"]+\/status\.json">/);
+  assert.ok(!html.includes("site-slo"), "the uptime line is no longer shown on the page");
   assert.match(html, /connect-src 'self' https:\/\/raw\.githubusercontent\.com;/);
   const none = copy();
   delete none.siteSlo;
-  assert.ok(!render(none).includes("site-slo"));
+  assert.ok(!render(none).includes("data-slo-url"));
   assert.ok(!render(none).includes("connect-src"));
   const bad = copy();
   bad.siteSlo.statusUrl = "https://evil.example/status.json";

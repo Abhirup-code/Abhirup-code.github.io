@@ -38,13 +38,12 @@ Then open http://localhost:8000.
 `.github/workflows/uptime.yml` checks the live site every 15 minutes. A check passes only if the
 home page answers 200, contains my name, and loads in under 3 seconds. `scripts/uptime.mjs` keeps
 30 days of daily totals in `status.json` on the `uptime-data` branch (one commit, rewritten each
-time), and the home page shows the result against a **99.9% objective**, for example:
+time). Type `uptime` in the site's hidden terminal (the `` ` `` key) to see the result against a
+**99.9% objective**, for example:
 
 > This site: 99.97% up over 30 days · error budget 65% left · checked 6 min ago
 
-The dot is green with more than 25% of the budget left, amber below that, red once it is spent, and
-grey if the last check is more than 2 hours old. If the data cannot be read, the badge stays hidden.
-To run a check by hand: Actions, then **Uptime check**, then **Run workflow**.
+The data is only fetched when you run the command. To run a check by hand: Actions, then **Uptime check**, then **Run workflow**.
 
 ## The lab
 
@@ -80,7 +79,7 @@ file works the same way, for example `assets/styles.css`.
 | Contact form | Plain HTML, no JavaScript: name, email, and message post to Web3Forms, which emails them to me and sends the visitor to a thank-you page. A hidden field catches spam bots |
 | Motion | A skills ticker, a spinning badge, a rotating role line, hover lift on projects, magnetic buttons, a timeline that draws itself as you scroll, and sections that rise into place; all motion stops for people who turn on reduced motion |
 | Interactive | Project pop-ups with a short case study, full case study pages under `work/`, a recommendations carousel with pause and previous/next controls, and a dark mode that follows the system setting or a saved choice. A quick facts pop-up, skills that open a list of where each was used, and a hidden terminal (the footer button or the ` key; try `help`). Everything still works without JavaScript: tiles link to the case study pages, skill lists open as plain disclosures, and recommendations stack |
-| Reliability | A 99.9% uptime SLO measured every 15 minutes and shown live on the home page, public blameless postmortems under `postmortems/`, and an interactive error budget lab under `lab/` |
+| Reliability | A 99.9% uptime SLO measured every 15 minutes and shown by the terminal's `uptime` command, public blameless postmortems under `postmortems/`, and an interactive error budget lab under `lab/` |
 | Supply chain | Every published file carries a signed build provenance attestation |
 | Accessibility | axe-core finds no WCAG 2.1 AA issues at desktop and phone sizes in light and dark mode, including with a pop-up open and on the case study pages; skip link, focus outlines, focus returns after closing a pop-up, and the carousel never auto-plays for reduced-motion users |
 | Tests | `node --test` checks the content, escaping, allowed links, page order, and build output |
