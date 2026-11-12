@@ -27,11 +27,46 @@
   ],
   "projects": [
     {
+      "title": "HelpDesk Autopilot",
+      "kicker": "IT automation",
+      "description": "Automates onboarding, offboarding, and password resets with approvals and an audit log.",
+      "url": "https://github.com/Abhirup-code/HelpDesk_Autopilot",
+      "style": "feature",
+      "caseStudy": {
+        "slug": "helpdesk-autopilot",
+        "problem": "At small companies, one or two IT people handle every request by hand. Password resets eat the day, offboarding gets missed, and nobody can say who changed whose access or how long tickets take.",
+        "built": [
+          "One-time password reset links that expire in 15 minutes",
+          "New-hire accounts and groups created from the request, and leavers disabled on their last day",
+          "Manager approval for access, plus a second IT approval for admin rights",
+          "An audit log the database itself refuses to delete",
+          "A web portal for employees, managers, and IT agents",
+          "Prometheus metrics and a Grafana SLA dashboard with alerts"
+        ],
+        "results": [
+          "A 90% test coverage gate and Playwright browser tests",
+          "CI with Trivy and CodeQL security scans",
+          "Portal security: directory sign-in, CSRF tokens, lockout after 5 wrong passwords, and a strict Content-Security-Policy"
+        ],
+        "tech": [
+          "Python",
+          "FastAPI",
+          "PostgreSQL",
+          "OpenLDAP",
+          "PowerShell",
+          "Docker Compose",
+          "Prometheus",
+          "Grafana",
+          "Playwright"
+        ]
+      }
+    },
+    {
       "title": "Burn Rate",
       "kicker": "SRE lab",
       "description": "SLOs, burn-rate alerts, and a deploy gate that blocks releases when the error budget runs out, on Kubernetes.",
       "url": "https://github.com/Abhirup-code/Burn_Rate",
-      "style": "feature",
+      "style": "blue",
       "caseStudy": {
         "slug": "burn-rate",
         "problem": "Teams argue about whether a service is reliable enough without numbers to settle it. I wanted to run a small service the way an SRE team runs production, and prove each part works by breaking it on purpose.",
@@ -185,41 +220,6 @@
           "Hypothesis",
           "Atheris",
           "Docker"
-        ]
-      }
-    },
-    {
-      "title": "HelpDesk Autopilot",
-      "kicker": "IT automation",
-      "description": "Automates onboarding, offboarding, and password resets with approvals and an audit log.",
-      "url": "https://github.com/Abhirup-code/HelpDesk_Autopilot",
-      "style": "blue",
-      "caseStudy": {
-        "slug": "helpdesk-autopilot",
-        "problem": "At small companies, one or two IT people handle every request by hand. Password resets eat the day, offboarding gets missed, and nobody can say who changed whose access or how long tickets take.",
-        "built": [
-          "One-time password reset links that expire in 15 minutes",
-          "New-hire accounts and groups created from the request, and leavers disabled on their last day",
-          "Manager approval for access, plus a second IT approval for admin rights",
-          "An audit log the database itself refuses to delete",
-          "A web portal for employees, managers, and IT agents",
-          "Prometheus metrics and a Grafana SLA dashboard with alerts"
-        ],
-        "results": [
-          "A 90% test coverage gate and Playwright browser tests",
-          "CI with Trivy and CodeQL security scans",
-          "Portal security: directory sign-in, CSRF tokens, lockout after 5 wrong passwords, and a strict Content-Security-Policy"
-        ],
-        "tech": [
-          "Python",
-          "FastAPI",
-          "PostgreSQL",
-          "OpenLDAP",
-          "PowerShell",
-          "Docker Compose",
-          "Prometheus",
-          "Grafana",
-          "Playwright"
         ]
       }
     },
