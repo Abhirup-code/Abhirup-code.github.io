@@ -141,6 +141,10 @@ button.btn { font: 600 16px var(--sans); cursor: pointer; }
 .tile:nth-child(2), .tile:nth-child(3) { grid-column: span 5; }
 .tile:nth-child(4) { grid-column: 1 / span 5; }
 .tile:nth-child(5) { grid-column: span 4; }
+/* Six or seven projects: the sixth fills the third row, the seventh shares the last row with the stat. */
+.tile:nth-child(6) { grid-column: span 3; }
+.tile:nth-child(7) { grid-column: 1 / span 8; }
+.tile:nth-child(7) ~ .tile-stat { grid-column: span 4; }
 .tile-stat { grid-column: span 3; padding: 24px; border: 2px dashed var(--dash); display: flex; flex-direction: column; justify-content: center; gap: 6px; }
 .tile-stat:hover { transform: none; box-shadow: none; }
 .tile-stat strong { font: 900 44px/1 var(--serif); }
