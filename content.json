@@ -61,6 +61,39 @@
       }
     },
     {
+      "title": "Ask the Runbook",
+      "kicker": "Local AI",
+      "description": "An on-call assistant that answers from runbooks, cites every claim, and says when it does not know.",
+      "url": "https://github.com/Abhirup-code/Ask_the_Runbook",
+      "style": "accent",
+      "caseStudy": {
+        "slug": "ask-the-runbook",
+        "problem": "During an incident nobody wants to dig through five runbooks, and an AI that makes up a command or a threshold is worse than no help at all.",
+        "built": [
+          "Runbooks split into sections at their headings and searched with BM25, so every answer can cite the exact section",
+          "An agent loop on a free local model through Ollama, with two tools: search the runbooks and read a section",
+          "A guard on every answer: it must cite sections it actually read, and every number in it must appear in those sections",
+          "When the guard rejects an answer twice, the agent says it cannot answer and lists the 3 closest sections",
+          "JSON output, so a chat bot or a script can use the answer and its sources"
+        ],
+        "results": [
+          "Retrieval eval: the right section ranks in the top 3 for 16 of 18 questions, and CI fails under 85%",
+          "Guard eval: 15 of 15 good and bad answers handled correctly, and CI fails on a single wrong verdict",
+          "Tested on a weak 1.5B model: it invented citations, the guard blocked every one, and after my fixes it answered with a real citation",
+          "69 tests at 99% coverage, run against a scripted model so they need no LLM"
+        ],
+        "tech": [
+          "Python",
+          "Ollama",
+          "RAG",
+          "BM25",
+          "pytest",
+          "ruff",
+          "GitHub Actions"
+        ]
+      }
+    },
+    {
       "title": "Live Status Dashboard",
       "kicker": "Live demo",
       "description": "Real-time health checks, uptime, and an outage log. React, TypeScript, Jest.",
