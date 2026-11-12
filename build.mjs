@@ -246,6 +246,7 @@ ${c.url ? `<link rel="canonical" href="${esc(safeUrl(c.url).replace(/\/?$/, "/")
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&amp;family=Inter:wght@400;500;600;700&amp;display=swap">
 <link rel="stylesheet" href="../assets/styles.css">
 <script src="../assets/app.js" defer></script>
+<script src="../assets/stars.js" defer></script>
 ${scripts.map((src) => `<script src="../assets/${src}" defer></script>`).join("\n")}
 </head>
 <body>
@@ -671,6 +672,7 @@ ${c.url ? `<meta property="og:url" content="${esc(safeUrl(c.url))}">` : ""}
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&amp;family=Inter:wght@400;500;600;700&amp;display=swap">
 <link rel="stylesheet" href="assets/styles.css">
 <script src="assets/app.js" defer></script>
+<script src="assets/stars.js" defer></script>
 <script type="application/ld+json">${JSON.stringify(person).replaceAll("<", "\\u003c")}</script>
 </head>
 <body>

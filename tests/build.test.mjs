@@ -87,7 +87,7 @@ test("scripts can only come from this site, and none are inline", () => {
     assert.match(html, /<meta http-equiv="Content-Security-Policy" content="[^"]*script-src 'self'/);
     const scripts = html.match(/<script[^>]*>/g) ?? [];
     for (const tag of scripts) {
-      assert.match(tag, /^<script (src="(\.\.\/)?assets\/(theme|app)\.js"( defer)?|type="application\/ld\+json"|type="application\/json" id="site-data")>$/, tag);
+      assert.match(tag, /^<script (src="(\.\.\/)?assets\/(theme|app|stars)\.js"( defer)?|type="application\/ld\+json"|type="application\/json" id="site-data")>$/, tag);
     }
     // style-src has no 'unsafe-inline', so an inline style attribute would be silently ignored.
     assert.ok(!/\sstyle="/.test(html), "no inline style attributes");
@@ -149,7 +149,7 @@ test("outside links open in a new tab without giving it access to this page", ()
 
 test("the build writes the page, assets, domain, and 404 page", () => {
   const out = build(join(mkdtempSync(join(tmpdir(), "site-")), "_site"));
-  for (const file of ["index.html", "404.html", "thanks.html", "work/honest-fit.html", "postmortems/index.html", "postmortems/k6-flag-removed.html", "lab/index.html", "assets/slo-sim.js", "assets/lab.js", "assets/app.js", "assets/theme.js", "CNAME", "robots.txt", "assets/styles.css", "assets/favicon.svg", content.links.resume]) {
+  for (const file of ["index.html", "404.html", "thanks.html", "work/honest-fit.html", "postmortems/index.html", "postmortems/k6-flag-removed.html", "lab/index.html", "assets/slo-sim.js", "assets/lab.js", "assets/app.js", "assets/stars.js", "assets/theme.js", "CNAME", "robots.txt", "assets/styles.css", "assets/favicon.svg", content.links.resume]) {
     assert.ok(existsSync(join(out, file)), file);
   }
   assert.equal(readFileSync(join(out, "CNAME"), "utf8").trim(), "abhirupkhan.me");
