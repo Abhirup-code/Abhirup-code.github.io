@@ -57,6 +57,23 @@
     });
   });
 
+  /* ---------- Photo: tilt toward the pointer ---------- */
+  document.querySelectorAll(".photo-stage").forEach(function (stage) {
+    if (reduceMotion.matches) return;
+    var art = stage.closest(".hero") || stage;
+    art.addEventListener("pointermove", function (e) {
+      var box = stage.getBoundingClientRect();
+      var x = (e.clientX - (box.left + box.width / 2)) / box.width;
+      var y = (e.clientY - (box.top + box.height / 2)) / box.height;
+      stage.style.setProperty("--tilt-x", (Math.max(-1, Math.min(1, x)) * 10).toFixed(2) + "deg");
+      stage.style.setProperty("--tilt-y", (Math.max(-1, Math.min(1, y)) * -8).toFixed(2) + "deg");
+    });
+    art.addEventListener("pointerleave", function () {
+      stage.style.setProperty("--tilt-x", "0deg");
+      stage.style.setProperty("--tilt-y", "0deg");
+    });
+  });
+
   /* ---------- Magnetic buttons: lean a little toward the pointer ---------- */
   var finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
   document.querySelectorAll(".magnetic").forEach(function (el) {

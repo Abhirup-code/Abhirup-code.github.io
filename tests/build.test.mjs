@@ -78,7 +78,8 @@ test("a photo is optional", () => {
   c.photo = "assets/photo.jpg";
   const html = render(c);
   assert.ok(html.includes('<img class="photo" src="assets/photo.jpg" alt="Abhirup Khan"'));
-  assert.ok(html.includes('<div class="hero-art has-photo"><figure class="photo-wrap"><img class="photo"'));
+  assert.ok(html.includes('<div class="hero-art has-photo"><div class="photo-stage">'));
+  assert.ok(html.includes('<figure class="photo-wrap"><img class="photo" src="assets/photo.jpg"'));
 });
 
 test("scripts can only come from this site, and none are inline", () => {

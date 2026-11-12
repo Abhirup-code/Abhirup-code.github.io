@@ -650,7 +650,7 @@ export function render(c) {
   const L = c.links;
   const ticker = (c.ticker ?? []).map(esc).join("  /  ") + "  /  ";
   const photo = c.photo
-    ? `<figure class="photo-wrap"><img class="photo" src="${esc(safeUrl(c.photo))}" alt="${esc(c.name)}" width="640" height="695"></figure>`
+    ? `<div class="photo-stage"><figure class="photo-wrap"><img class="photo" src="${esc(safeUrl(c.photo))}" alt="${esc(c.name)}" width="640" height="695"><span class="photo-light" aria-hidden="true"></span></figure></div>`
     : "";
   const stat = c.stat
     ? `<div class="tile tile-stat"><strong>${esc(c.stat.value)}</strong><span>${esc(c.stat.label)}</span></div>`

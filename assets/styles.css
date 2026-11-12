@@ -152,6 +152,18 @@ button.btn { font: 600 16px var(--sans); cursor: pointer; }
 .photo-wrap { position: relative; margin: 0; isolation: isolate; -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 96%); mask-image: linear-gradient(to bottom, #000 62%, transparent 96%); }
 .photo-wrap::before { content: ""; position: absolute; z-index: -1; inset: 16% 10% 0; background: var(--accent); border-radius: 999px 999px 0 0; }
 .photo { display: block; width: 100%; height: auto; }
+/* Making it move: the photo floats and tilts toward the pointer (app.js sets --tilt-x and --tilt-y). */
+.photo-stage { position: relative; translate: 0 0; transform: perspective(900px) rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg)); transition: transform .4s ease-out; animation: float 6s ease-in-out infinite alternate; }
+@keyframes float { to { translate: 0 -10px; } }
+/* Signs of life, all on the whole photo so nothing ever separates: slow breathing with a slight sway,
+   a band of studio light that moves across, and a warm glow that pulses behind. */
+.photo-wrap .photo { transform-origin: 50% 100%; animation: breathe 4.6s ease-in-out infinite; }
+@keyframes breathe { 50% { transform: scale(1.008, 1.016) rotate(.4deg); } }
+.photo-wrap::before { animation: glow 6s ease-in-out infinite; }
+@keyframes glow { 50% { box-shadow: 0 0 60px 6px rgba(255, 95, 31, .45); filter: brightness(1.12); } }
+.photo-light { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, .28) 50%, transparent 62%) no-repeat; background-size: 250% 100%; mix-blend-mode: soft-light;
+  -webkit-mask: url(photo.webp) 0 0 / 100% 100%; mask: url(photo.webp) 0 0 / 100% 100%; animation: sweep 8s ease-in-out infinite; }
+@keyframes sweep { 0% { background-position: 120% 0; } 55%, 100% { background-position: -20% 0; } }
 .has-photo .badge { position: absolute; left: -48px; bottom: 18%; }
 .badge { width: 140px; height: 140px; animation: spin 18s linear infinite; }
 .badge-bg { fill: var(--accent); }
@@ -556,7 +568,7 @@ button.btn { font: 600 16px var(--sans); cursor: pointer; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .ticker-track, .badge, .reveal, .timeline::before, .job-dot, .project-dialog[open] { animation: none; }
+  .ticker-track, .badge, .reveal, .photo-stage, .photo-wrap .photo, .photo-wrap::before, .photo-light, .timeline::before, .job-dot, .project-dialog[open] { animation: none; }
   .role-static { display: inline; }
   .role-anim { display: none; }
   .is-carousel .rec { transition: none; transform: none; }
