@@ -610,6 +610,93 @@
   },
   "postmortems": [
     {
+      "slug": "game-day-lab-setup-timeout",
+      "date": "2026-11-09",
+      "title": "Game day: checkout outage, and a lab setup that failed halfway",
+      "system": "Burn_Rate lab",
+      "severity": "Drill (page)",
+      "summary": "A second planned drill, this time on my MacBook Air. Every checkout failed on purpose for 69 seconds. The page fired 61 seconds after the first failure, the deploy gate blocked feature releases, a hotfix got through with its reason on record, and the error rate was back under budget 300 seconds after the fix. The real finding came before the drill: setting up the lab had failed halfway, which left the Grafana dashboard looking broken.",
+      "impact": [
+        {
+          "label": "What failed",
+          "value": "100% of checkout requests, for 69 seconds"
+        },
+        {
+          "label": "Users affected",
+          "value": "None. This was the lab, on purpose"
+        },
+        {
+          "label": "Time to detect",
+          "value": "61 seconds"
+        },
+        {
+          "label": "Time to recover",
+          "value": "300 seconds after the fix, measured by the 5 minute error rate"
+        }
+      ],
+      "timeline": [
+        {
+          "time": "20:23:29 UTC",
+          "event": "Deploy gate checked while checkout is healthy"
+        },
+        {
+          "time": "20:25:28 UTC",
+          "event": "Chaos switch on: every checkout fails"
+        },
+        {
+          "time": "20:26:32 UTC",
+          "event": "CheckoutAvailabilityBudgetBurn (page) fires, 61 seconds in"
+        },
+        {
+          "time": "20:26:32 UTC",
+          "event": "Deploy gate blocks feature releases: error budget exhausted"
+        },
+        {
+          "time": "20:26:33 UTC",
+          "event": "Hotfix allowed through the gate with a recorded reason"
+        },
+        {
+          "time": "20:26:37 UTC",
+          "event": "Mitigated: chaos switch off"
+        },
+        {
+          "time": "20:31:37 UTC",
+          "event": "Recovered: 5 minute error rate back under the 0.5% budget"
+        }
+      ],
+      "rootCause": "The outage was intentional. Before it, make up had stopped with \"etcdserver: request timed out\" while applying the checkout manifests: Prometheus, Alertmanager, Grafana, the app, and the load generator all start at once on one laptop, and the Kubernetes API server was too busy to answer. The setup script ran kubectl apply once and gave up on the first error, even though apply is safe to repeat. I opened Grafana before the cluster settled, saw \"Dashboard not found\", and went looking for a dashboard bug that was not there.",
+      "detection": "The right alert fired once, at page severity, 61 seconds in. With only about 20 minutes of history the one hour window is mostly outage, so it pages faster than production would. The alert unit tests, which start with 3 days of history, show the same outage paging after about 4.5 minutes.",
+      "wentWell": [
+        "The page fired once, at the right severity, and nothing paged twice.",
+        "The gate blocked features as soon as the budget was gone and still let the fix through.",
+        "The game day script printed a timeline I could paste straight into the postmortem."
+      ],
+      "wentBadly": [
+        "The setup failed halfway and I did not notice before starting the drill.",
+        "\"Dashboard not found\" pointed at Grafana when the real cause was the setup.",
+        "A budget of -6152.3% looks alarming in a screenshot without the short-history explanation."
+      ],
+      "actions": [
+        {
+          "action": "The setup script retries kubectl apply up to 3 times, so one timeout no longer leaves half the lab missing.",
+          "type": "Prevent"
+        },
+        {
+          "action": "Run make check after make up and before any drill, and stop if it fails.",
+          "type": "Detect"
+        },
+        {
+          "action": "Give Docker Desktop at least 6 GB of memory on a laptop.",
+          "type": "Prevent"
+        },
+        {
+          "action": "Explain the short-history effect next to any screenshot of the budget.",
+          "type": "Document"
+        }
+      ],
+      "link": "https://github.com/Abhirup-code/Burn_Rate/blob/main/docs/postmortems/2026-11-09-game-day-checkout-outage.md"
+    },
+    {
       "slug": "game-day-checkout-outage",
       "date": "2026-11-06",
       "title": "Game day: full checkout outage in the Burn_Rate lab",
