@@ -279,8 +279,8 @@
     },
     {
       "title": "Fulfillment Radar",
-      "description": "SQL and Python analytics for a marketplace: revenue, cancellations, and seller delivery KPIs, checked with tests.",
-      "tech": "SQL · Python",
+      "description": "SQL and Python analytics for a marketplace: revenue, cancellations, and seller delivery rates with 95% confidence intervals, plus buyer cohort retention. The data is validated before any KPI runs, and CI fails if a report goes stale.",
+      "tech": "SQL · Python · pandas · GitHub Actions",
       "url": "https://github.com/Abhirup-code/fulfillment-radar"
     },
     {
