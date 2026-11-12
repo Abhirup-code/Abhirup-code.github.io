@@ -121,10 +121,15 @@ h1, h2, h3 { margin: 0; }
 @keyframes marquee { to { transform: translateX(-50%); } }
 
 /* Hero */
-.hero { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name art" "intro art" "role art" "cta art"; column-gap: 32px; padding-top: clamp(24px, 3.5vw, 40px); padding-bottom: 16px; }
+.hero { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name art" "say art" "intro art" "role art" "cta art"; column-gap: 32px; padding-top: clamp(24px, 3.5vw, 40px); padding-bottom: 16px; }
 .hero h1 { grid-area: name; font: 900 clamp(52px, 8vw, 112px)/0.9 var(--serif); letter-spacing: -0.03em; }
 .hero h1 span { display: block; }
 .name-last { color: var(--accent); }
+.say-name { grid-area: say; display: flex; align-items: center; gap: 8px; margin: 14px 0 0; font-size: 15px; color: var(--text-2); }
+.say-name strong { color: var(--ink); font-weight: 600; }
+.say-btn { display: inline-grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 2px solid var(--ink); border-radius: 999px; background: transparent; color: var(--ink); cursor: pointer; }
+.say-btn:hover, .say-btn.is-playing { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.say-btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .intro { grid-area: intro; max-width: 560px; margin: 18px 0 0; font-size: clamp(15px, 1.4vw, 17px); color: var(--text-2); }
 .role { grid-area: role; margin: 12px 0 0; font-weight: 600; color: var(--accent-text); letter-spacing: 0.04em; text-transform: uppercase; font-size: 14px; }
 .role-static { display: none; }
@@ -534,7 +539,7 @@ button.btn { font: 600 16px var(--sans); cursor: pointer; }
 
 /* Phones */
 @media (max-width: 640px) {
-  .hero { grid-template-columns: 1fr; grid-template-areas: "name" "intro" "role" "cta" "art"; }
+  .hero { grid-template-columns: 1fr; grid-template-areas: "name" "say" "intro" "role" "cta" "art"; }
   .hero-art.has-photo { width: min(100%, 340px); margin-inline: auto; }
   .has-photo .badge { left: auto; right: -8px; bottom: 22%; }
   .hero-art { margin-top: 20px; width: 104px; min-height: 104px; }

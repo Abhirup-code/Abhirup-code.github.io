@@ -45,6 +45,11 @@ export function validate(c) {
   need(text(c?.name), "name is missing");
   need(text(c?.role), "role is missing");
   need(text(c?.intro), "intro is missing");
+  if (c?.pronounce != null) {
+    need(text(c.pronounce.text), "pronounce.text is missing");
+    need(c.pronounce.audio == null || /^assets\/[\w.-]+\.(mp3|m4a|ogg|wav)$/.test(c.pronounce.audio),
+      "pronounce.audio must be a sound file in assets/ (mp3, m4a, ogg, or wav)");
+  }
   need(text(c?.links?.email), "links.email is missing");
   need(Array.isArray(c?.projects) && c.projects.length > 0, "projects must be a non-empty list");
   need(Array.isArray(c?.experience) && c.experience.length > 0, "experience must be a non-empty list");
@@ -630,6 +635,15 @@ function roleLine(c) {
   return `<p class="role"><span class="sr-only">Open to roles in ${esc(roles.join(", "))}</span><span class="role-static" aria-hidden="true">${esc(c.role)}</span><span class="role-anim" aria-hidden="true">Open to roles in <span class="rotator rotator-${Math.min(roles.length, 5)}"><span class="rotator-track">${[...roles, roles[0]].map((r) => `<span>${esc(r)}</span>`).join("")}</span></span></span></p>`;
 }
 
+// How to say my name: the spelling always shows; app.js reveals the play button when it can speak
+// (a recording if pronounce.audio is set, otherwise the browser's own voice).
+function sayName(c) {
+  const p = c.pronounce;
+  if (!p) return "";
+  const audio = p.audio ? ` data-audio="${esc(safeUrl(p.audio))}"` : "";
+  return `<p class="say-name">Say it: <strong>${esc(p.text)}</strong> <button class="say-btn" type="button" data-say="${esc(p.speak ?? p.text)}"${audio} aria-label="Play how to say my name" hidden><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"></path><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></button></p>`;
+}
+
 export function render(c) {
   const problems = validate(c);
   if (problems.length) throw new Error(`content.json has problems:\n- ${problems.join("\n- ")}`);
@@ -691,6 +705,7 @@ ${c.url ? `<meta property="og:url" content="${esc(safeUrl(c.url))}">` : ""}
 <main id="main">
   <section class="hero wrap" id="top"${c.siteSlo ? ` data-slo-url="${esc(c.siteSlo.statusUrl)}"` : ""}>
     <h1><span class="name-first">${esc(first)}</span> <span class="name-last">${esc(rest.join(" "))}.</span></h1>
+    ${sayName(c)}
     <p class="intro">${esc(c.intro)}</p>
     ${roleLine(c)}
     ${c.quickView ? `<p class="hero-cta"><a class="btn btn-solid magnetic" href="#contact" data-dialog="dlg-quick">Quick facts</a></p>` : ""}

@@ -366,3 +366,17 @@ test("the lab page loads only its own scripts and works as a plain page without 
   delete none.lab;
   assert.ok(!render(none).includes('id="lab"'));
 });
+
+test("the name has a say-it line, and its play button stays hidden until app.js can speak", () => {
+  const html = render(content);
+  assert.match(html, /<p class="say-name">Say it: <strong>Avi-roop<\/strong> <button class="say-btn" type="button" data-say="[^"]+" aria-label="Play how to say my name" hidden>/);
+  const none = copy();
+  delete none.pronounce;
+  assert.ok(!render(none).includes("say-name"));
+  const rec = copy();
+  rec.pronounce.audio = "assets/name.mp3";
+  assert.ok(render(rec).includes('data-audio="assets/name.mp3"'));
+  const bad = copy();
+  bad.pronounce.audio = "https://evil.example/x.mp3";
+  assert.ok(validate(bad).some((p) => p.startsWith("pronounce.audio")));
+});

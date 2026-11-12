@@ -31,6 +31,32 @@
   if (systemDark.addEventListener) systemDark.addEventListener("change", labelToggles);
   labelToggles();
 
+  /* ---------- Say my name: a recording if there is one, otherwise the browser's voice ---------- */
+  document.querySelectorAll(".say-btn").forEach(function (btn) {
+    var src = btn.getAttribute("data-audio");
+    var synth = window.speechSynthesis;
+    if (!src && !(synth && window.SpeechSynthesisUtterance)) return; // nothing can speak: spelling only
+    btn.hidden = false;
+    function done() { btn.classList.remove("is-playing"); }
+    btn.addEventListener("click", function () {
+      btn.classList.add("is-playing");
+      if (src) {
+        var audio = new Audio(src);
+        audio.addEventListener("ended", done);
+        audio.addEventListener("error", done);
+        audio.play().catch(done);
+        return;
+      }
+      synth.cancel();
+      var say = new SpeechSynthesisUtterance(btn.getAttribute("data-say"));
+      say.lang = "en-US";
+      say.rate = 0.8;
+      say.onend = done;
+      say.onerror = done;
+      synth.speak(say);
+    });
+  });
+
   /* ---------- Magnetic buttons: lean a little toward the pointer ---------- */
   var finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
   document.querySelectorAll(".magnetic").forEach(function (el) {
