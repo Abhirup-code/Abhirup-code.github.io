@@ -1,10 +1,10 @@
 // Runs before the page paints, so a saved light or dark choice never flashes the wrong theme.
-// Without a saved choice, the CSS follows the visitor's system setting.
+// Without a saved choice the site opens in dark mode, black space with stars; the toggle switches to light.
 (function () {
   try {
     var saved = localStorage.getItem("theme");
-    if (saved === "dark" || saved === "light") document.documentElement.setAttribute("data-theme", saved);
+    document.documentElement.setAttribute("data-theme", saved === "light" ? "light" : "dark");
   } catch (e) {
-    /* storage blocked: follow the system setting */
+    document.documentElement.setAttribute("data-theme", "dark"); /* storage blocked: still dark */
   }
 })();
