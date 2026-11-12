@@ -27,12 +27,46 @@
   ],
   "projects": [
     {
+      "title": "Burn Rate",
+      "kicker": "SRE lab",
+      "description": "SLOs, burn-rate alerts, and a deploy gate that blocks releases when the error budget runs out, on Kubernetes.",
+      "url": "https://github.com/Abhirup-code/Burn_Rate",
+      "style": "feature",
+      "caseStudy": {
+        "slug": "burn-rate",
+        "problem": "Teams argue about whether a service is reliable enough without numbers to settle it. I wanted to run a small service the way an SRE team runs production, and prove each part works by breaking it on purpose.",
+        "built": [
+          "Two SLOs for a checkout service on Kubernetes: 99.5% of requests succeed and 95% finish under 300 ms, over 30 days",
+          "Multi-window burn-rate alerts generated with Sloth: a page when the budget burns 14.4 times too fast, a ticket for slower burns, routed by Alertmanager",
+          "A deploy gate that blocks feature releases once the error budget is gone, lets a hotfix through with its reason on record, and blocks when it cannot read the budget",
+          "A chaos switch and a game day script that breaks checkout, waits for the page, and prints the timeline for the postmortem",
+          "An SLO report and a Grafana dashboard that show the budget left and when it runs out at the current pace"
+        ],
+        "results": [
+          "In my game day, a full outage paged in 61 seconds and the gate blocked feature releases a second later",
+          "59 Python tests with a 95% coverage floor, plus promtool unit tests for the alert rules",
+          "CI starts the whole lab on kind and checks the gate end to end. It caught the gate letting releases through when its data was missing, which I fixed"
+        ],
+        "tech": [
+          "Kubernetes",
+          "kind",
+          "Prometheus",
+          "Sloth",
+          "Alertmanager",
+          "Grafana",
+          "k6",
+          "Python",
+          "GitHub Actions"
+        ]
+      }
+    },
+    {
       "title": "Live Status Dashboard",
       "kicker": "Live demo",
       "description": "Real-time health checks, uptime, and an outage log. React, TypeScript, Jest.",
       "url": "https://abhirup-code.github.io/live-status-dashboard/",
       "code": "https://github.com/Abhirup-code/live-status-dashboard",
-      "style": "feature",
+      "style": "blue",
       "caseStudy": {
         "slug": "live-status-dashboard",
         "problem": "Health check results only help if someone notices a problem the moment it starts. My aws-healthcheck-iac project writes health checks to a JSON report, so I built a dashboard that shows that report live and makes outages obvious.",
