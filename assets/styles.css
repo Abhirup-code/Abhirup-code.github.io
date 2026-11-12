@@ -114,10 +114,13 @@ button.btn { font: 600 16px var(--sans); cursor: pointer; }
 @keyframes roll4 { 0%, 20% { transform: translateY(0); } 25%, 45% { transform: translateY(-1.3em); } 50%, 70% { transform: translateY(-2.6em); } 75%, 95% { transform: translateY(-3.9em); } 100% { transform: translateY(-5.2em); } }
 @keyframes roll5 { 0%, 16% { transform: translateY(0); } 20%, 36% { transform: translateY(-1.3em); } 40%, 56% { transform: translateY(-2.6em); } 60%, 76% { transform: translateY(-3.9em); } 80%, 96% { transform: translateY(-5.2em); } 100% { transform: translateY(-6.5em); } }
 .hero-art { grid-area: art; position: relative; align-self: center; width: 150px; min-height: 150px; }
-.hero-art.has-photo { width: 300px; min-height: 380px; }
-.photo { display: block; width: 270px; height: 340px; object-fit: cover; border-radius: 24px; border: 3px solid var(--ink); transform: rotate(3deg); }
+/* A black-and-white cut-out with no frame, in front of an arch in the accent color. Both fade into the page at the bottom. */
+.hero-art.has-photo { width: clamp(300px, 30vw, 400px); min-height: 0; align-self: end; }
+.photo-wrap { position: relative; margin: 0; isolation: isolate; -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 96%); mask-image: linear-gradient(to bottom, #000 62%, transparent 96%); }
+.photo-wrap::before { content: ""; position: absolute; z-index: -1; inset: 16% 10% 0; background: var(--accent); border-radius: 999px 999px 0 0; }
+.photo { display: block; width: 100%; height: auto; }
+.has-photo .badge { position: absolute; left: -48px; bottom: 18%; }
 .badge { width: 140px; height: 140px; animation: spin 18s linear infinite; }
-.has-photo .badge { position: absolute; left: -60px; bottom: -10px; }
 .badge-bg { fill: var(--accent); }
 .badge text { font: 700 12.5px var(--sans); fill: var(--on-accent); }
 .badge-arrow { stroke: var(--on-accent); stroke-width: 4; fill: none; stroke-linecap: round; stroke-linejoin: round; }
@@ -504,11 +507,10 @@ button.btn { font: 600 16px var(--sans); cursor: pointer; }
 /* Phones */
 @media (max-width: 640px) {
   .hero { grid-template-columns: 1fr; grid-template-areas: "name" "intro" "role" "cta" "art"; }
+  .hero-art.has-photo { width: min(100%, 340px); margin-inline: auto; }
+  .has-photo .badge { left: auto; right: -8px; bottom: 22%; }
   .hero-art { margin-top: 20px; width: 104px; min-height: 104px; }
   .hero-art .badge { width: 104px; height: 104px; }
-  .hero-art.has-photo { width: 100%; min-height: 0; }
-  .has-photo .photo { width: 220px; height: 280px; }
-  .has-photo .badge { left: auto; right: 0; bottom: -20px; }
   .tile:nth-child(n) { grid-column: 1 / -1; }
   .nav nav a:not(.pill):not(.nav-contact) { display: none; }
   .nav nav { gap: 12px; }

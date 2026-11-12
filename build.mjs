@@ -635,7 +635,7 @@ export function render(c) {
   const L = c.links;
   const ticker = (c.ticker ?? []).map(esc).join("  /  ") + "  /  ";
   const photo = c.photo
-    ? `<img class="photo" src="${esc(safeUrl(c.photo))}" alt="${esc(c.name)}" width="270" height="340">`
+    ? `<figure class="photo-wrap"><img class="photo" src="${esc(safeUrl(c.photo))}" alt="${esc(c.name)}" width="640" height="695"></figure>`
     : "";
   const stat = c.stat
     ? `<div class="tile tile-stat"><strong>${esc(c.stat.value)}</strong><span>${esc(c.stat.label)}</span></div>`
