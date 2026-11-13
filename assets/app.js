@@ -47,15 +47,30 @@
         audio.play().catch(done);
         return;
       }
-      synth.cancel();
+      // Chrome and Safari can drop speech silently: right after cancel(), before the voices have
+      // loaded, or when the utterance is garbage collected. So keep a reference, pick an English
+      // voice when one is listed, wait a moment after cancel, and never leave the button stuck.
+      if (synth.speaking || synth.pending) synth.cancel();
       var say = new SpeechSynthesisUtterance(btn.getAttribute("data-say"));
-      say.lang = "en-US";
-      say.rate = 0.8;
+      var voices = synth.getVoices();
+      var voice = voices.filter(function (v) { return /^en-IN/i.test(v.lang); })[0] ||
+        voices.filter(function (v) { return /^en/i.test(v.lang); })[0];
+      if (voice) say.voice = voice;
+      say.lang = voice ? voice.lang : "en-US";
+      say.rate = 0.85;
+      say.volume = 1;
       say.onend = done;
       say.onerror = done;
-      synth.speak(say);
+      btn._utterance = say;
+      setTimeout(function () {
+        synth.resume();
+        synth.speak(say);
+      }, 60);
+      setTimeout(done, 4000);
     });
   });
+  // Ask for the voice list early: some browsers only fill it in after the first request.
+  if (window.speechSynthesis) window.speechSynthesis.getVoices();
 
   /* ---------- Photo: tilt toward the pointer ---------- */
   document.querySelectorAll(".photo-stage").forEach(function (stage) {
