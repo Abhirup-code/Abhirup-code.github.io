@@ -29,6 +29,8 @@
   --shadow: rgba(28, 25, 23, .18);
   --star: rgba(28, 25, 23, .45);
   --star-rgb: 28, 25, 23;
+  --skyline: rgba(28, 25, 23, .10);
+  --skyline-lights: rgba(196, 65, 14, .45);
   --neb-1: rgba(123, 92, 255, .14);
   --neb-2: rgba(255, 95, 31, .12);
   --neb-3: rgba(31, 200, 255, .12);
@@ -39,7 +41,7 @@
   --surface: #1d1a17; --text-2: #d3cbc1; --accent-text: #fb923c;
   --ok-text: #4ade80; --warn-text: #fbbf24; --inverse-bg: #f1ece4; --inverse-fg: #1c1917; --inverse-muted: #57534e; --inverse-soft: #44403c; --inverse-link: #9a3412;
   --dash: #6b625a; --shadow: rgba(0, 0, 0, .5);
-  --star: rgba(255, 255, 255, .85); --star-rgb: 255, 255, 255; --neb-1: rgba(70, 90, 160, .10); --neb-2: rgba(0, 0, 0, 0); --neb-3: rgba(70, 90, 160, .06);
+  --star: rgba(255, 255, 255, .85); --star-rgb: 255, 255, 255; --skyline: rgba(150, 160, 190, .14); --skyline-lights: rgba(255, 196, 120, .75); --neb-1: rgba(70, 90, 160, .10); --neb-2: rgba(0, 0, 0, 0); --neb-3: rgba(70, 90, 160, .06);
   color-scheme: dark;
 }
 @media (prefers-color-scheme: dark) {
@@ -48,7 +50,7 @@
     --surface: #1d1a17; --text-2: #d3cbc1; --accent-text: #fb923c;
     --ok-text: #4ade80; --warn-text: #fbbf24; --inverse-bg: #f1ece4; --inverse-fg: #1c1917; --inverse-muted: #57534e; --inverse-soft: #44403c; --inverse-link: #9a3412;
     --dash: #6b625a; --shadow: rgba(0, 0, 0, .5);
-    --star: rgba(255, 255, 255, .85); --star-rgb: 255, 255, 255; --neb-1: rgba(70, 90, 160, .10); --neb-2: rgba(0, 0, 0, 0); --neb-3: rgba(70, 90, 160, .06);
+    --star: rgba(255, 255, 255, .85); --star-rgb: 255, 255, 255; --skyline: rgba(150, 160, 190, .14); --skyline-lights: rgba(255, 196, 120, .75); --neb-1: rgba(70, 90, 160, .10); --neb-2: rgba(0, 0, 0, 0); --neb-3: rgba(70, 90, 160, .06);
     color-scheme: dark;
   }
 }
@@ -121,6 +123,12 @@ h1, h2, h3 { margin: 0; }
 @keyframes marquee { to { transform: translateX(-50%); } }
 
 /* Hero */
+/* Chicago: a faint skyline along the bottom of the top section, the full width of the screen, with a
+   few lit windows that glow softly. It sits behind everything and changes color with the theme. */
+.skyline { position: absolute; z-index: -1; left: 50%; bottom: -24px; width: 100vw; height: clamp(90px, 13vw, 190px); translate: -50% 0; pointer-events: none;
+  background: var(--skyline); -webkit-mask: url(skyline.svg) center bottom / cover no-repeat; mask: url(skyline.svg) center bottom / cover no-repeat; }
+.skyline-lights { position: absolute; inset: 0; background: var(--skyline-lights); -webkit-mask: url(skyline-lights.svg) center bottom / cover no-repeat; mask: url(skyline-lights.svg) center bottom / cover no-repeat; animation: windows 5s ease-in-out infinite alternate; }
+@keyframes windows { from { opacity: .45; } to { opacity: 1; } }
 .hero { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name art" "say art" "intro art" "role art" "cta art"; column-gap: 32px; padding-top: clamp(24px, 3.5vw, 40px); padding-bottom: 16px; }
 .hero h1 { grid-area: name; font: 900 clamp(52px, 8vw, 112px)/0.9 var(--serif); letter-spacing: -0.03em; }
 .hero h1 span { display: block; }
@@ -568,7 +576,7 @@ button.btn { font: 600 16px var(--sans); cursor: pointer; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .ticker-track, .badge, .reveal, .photo-stage, .photo-wrap .photo, .photo-wrap::before, .photo-light, .timeline::before, .job-dot, .project-dialog[open] { animation: none; }
+  .ticker-track, .badge, .reveal, .skyline-lights, .photo-stage, .photo-wrap .photo, .photo-wrap::before, .photo-light, .timeline::before, .job-dot, .project-dialog[open] { animation: none; }
   .role-static { display: inline; }
   .role-anim { display: none; }
   .is-carousel .rec { transition: none; transform: none; }

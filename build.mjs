@@ -694,6 +694,7 @@ ${c.url ? `<meta property="og:url" content="${esc(safeUrl(c.url))}">` : ""}
     <p class="intro">${esc(c.intro)}</p>
     ${roleLine(c)}
     ${c.quickView ? `<p class="hero-cta"><a class="btn btn-solid magnetic" href="#contact" data-dialog="dlg-quick">Quick facts</a></p>` : ""}
+    <div class="skyline" aria-hidden="true"><span class="skyline-lights"></span></div>
     <div class="hero-art${photo ? " has-photo" : ""}">${photo}
       <svg class="badge" viewBox="0 0 168 168" role="img" aria-label="${esc(c.badge.replaceAll("·", ",").replace(/[,\s]+$/, ""))}">
         <defs><path id="badge-circle" d="M84,84 m-60,0 a60,60 0 1,1 120,0 a60,60 0 1,1 -120,0"></path></defs>
