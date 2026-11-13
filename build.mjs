@@ -191,7 +191,7 @@ function projectTile(p) {
   return `
       <article class="tile tile-${esc(p.style)}">
         <a class="tile-link" ${target}>
-          <span class="tile-top"><span class="kicker">${esc(p.kicker ?? "")}</span><span class="arrow" aria-hidden="true">↗</span></span>
+          <span class="tile-top"><span class="kicker">${esc(p.kicker ?? "")}</span></span>
           <span class="tile-body"><strong class="tile-title">${esc(p.title)}</strong><span class="tile-desc">${esc(p.description)}</span></span>
         </a>${code}
       </article>`;

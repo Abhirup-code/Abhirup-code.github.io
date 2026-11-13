@@ -187,8 +187,6 @@ button.btn { font: 600 16px var(--sans); cursor: pointer; }
 .tile-link { display: flex; flex-direction: column; justify-content: space-between; gap: 16px; height: 100%; padding: 24px; text-decoration: none; border-radius: inherit; }
 .tile-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
 .kicker { font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
-.arrow { font-size: 24px; line-height: 1; transition: transform .3s; }
-.tile:hover .arrow { transform: translate(4px, -4px); }
 .tile-body { display: flex; flex-direction: column; gap: 8px; }
 .tile-title { font: 700 clamp(26px, 2.6vw, 32px)/1.05 var(--serif); }
 .tile-desc { font-size: 15px; opacity: .92; }
@@ -597,7 +595,7 @@ button.btn { font: 600 16px var(--sans); cursor: pointer; }
   .role-anim { display: none; }
   .is-carousel .rec { transition: none; transform: none; }
   .magnetic { transition: none; }
-  .tile, .arrow, .more-card a, .award, .award-star, .lead, .pm-card a { transition: none; }
+  .tile, .more-card a, .award, .award-star, .lead, .pm-card a { transition: none; }
   .terminal[open] { animation: none; }
   .lab-alert.is-firing { animation: none; }
   .lab-meter span { transition: none; }
