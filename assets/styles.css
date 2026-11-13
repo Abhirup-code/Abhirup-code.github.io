@@ -291,7 +291,19 @@ button.btn { font: 600 16px var(--sans); cursor: pointer; }
 .project-dialog h2 { margin: 6px 0 12px; font: 900 clamp(32px, 4vw, 44px)/1 var(--serif); letter-spacing: -0.02em; }
 .project-dialog h3 { margin: 22px 0 8px; font: 700 20px var(--serif); }
 .project-dialog ul:not(.chips) { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
-.project-dialog .chips { margin-top: 20px; }
+.project-dialog .chips { margin-top: 4px; }
+/* Big numbers, then tabs: Problem, What I built, Results, Tech. */
+.project-dialog ul.dialog-stats { list-style: none; margin: 8px 0 18px; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.dialog-stats li { border: 2px solid var(--ink); border-radius: 18px; padding: 12px 14px; }
+.dialog-stats strong { display: block; font: 900 clamp(26px, 3.4vw, 34px)/1.05 var(--serif); color: var(--accent-text); }
+.dialog-stats span { display: block; margin-top: 4px; font-size: 13px; color: var(--text-2); }
+.dialog-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 16px; }
+.dialog-tab { font: 600 15px var(--sans); padding: 8px 16px; border-radius: 999px; border: 2px solid var(--ink); background: transparent; color: var(--ink); cursor: pointer; }
+.dialog-tab:hover { border-color: var(--accent); }
+.dialog-tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.dialog-tab:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.dialog-pane { min-height: 190px; }
+.dialog-pane:not([hidden]) { animation: dialog-in .3s cubic-bezier(.2,.8,.2,1); }
 .dialog-problem { margin: 0; font-size: 17px; color: var(--text-2); }
 .dialog-close-form { position: absolute; top: 14px; right: 14px; margin: 0; }
 .dialog-close { width: 44px; height: 44px; border: 2px solid var(--ink); border-radius: 999px; background: transparent; color: var(--ink); font: 400 26px/1 var(--sans); cursor: pointer; }
@@ -568,6 +580,10 @@ button.btn { font: 600 16px var(--sans); cursor: pointer; }
   .nav nav a:not(.pill):not(.nav-contact) { display: none; }
   .nav nav { gap: 12px; }
   .project-dialog { padding: 28px 22px; }
+  .project-dialog ul.dialog-stats { gap: 8px; }
+  .dialog-stats li { padding: 10px; border-radius: 14px; }
+  .dialog-stats span { font-size: 12px; }
+  .dialog-stats strong { font-size: 22px; white-space: nowrap; }
   .card { padding: 24px; }
   .quick-facts, .lead-list, .pm-impact, .pm-two, .lab-grid { grid-template-columns: 1fr; }
   .lab-numbers { grid-template-columns: 1fr 1fr; }
@@ -576,7 +592,7 @@ button.btn { font: 600 16px var(--sans); cursor: pointer; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .ticker-track, .badge, .reveal, .skyline-lights, .photo-stage, .photo-wrap .photo, .photo-wrap::before, .photo-light, .timeline::before, .job-dot, .project-dialog[open] { animation: none; }
+  .ticker-track, .badge, .reveal, .skyline-lights, .photo-stage, .photo-wrap .photo, .photo-wrap::before, .photo-light, .timeline::before, .job-dot, .project-dialog[open], .dialog-pane:not([hidden]) { animation: none; }
   .role-static { display: inline; }
   .role-anim { display: none; }
   .is-carousel .rec { transition: none; transform: none; }

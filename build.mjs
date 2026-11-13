@@ -63,6 +63,8 @@ export function validate(c) {
       need(/^[a-z0-9-]+$/.test(cs.slug ?? ""), `projects[${i}].caseStudy.slug must be lowercase letters, numbers, and dashes`);
       need(text(cs.problem) && [cs.built, cs.results, cs.tech].every((l) => Array.isArray(l) && l.length && l.every(text)),
         `projects[${i}].caseStudy needs problem, built, results, and tech`);
+      need(cs.stats == null || (Array.isArray(cs.stats) && cs.stats.length <= 4 && cs.stats.every((x) => text(x?.value) && text(x?.label))),
+        `projects[${i}].caseStudy.stats must be up to 4 items, each with a value and a label`);
     }
   }
   need((c?.roles ?? []).every(text), "roles must be a list of text");
@@ -207,21 +209,35 @@ function projectLinks(p) {
   return out.join("\n          ");
 }
 
-/** A pop-up with the short version of a case study. JavaScript opens it; without it the tile links to the page. */
+/**
+ * A pop-up with the short version of a case study: big numbers first, then tabs for the problem, what I
+ * built, the results, and the tech. JavaScript opens it and switches the tabs; without it the tile links
+ * to the full page.
+ */
 function projectDialog(p) {
   const cs = p.caseStudy;
   const id = `dlg-${esc(cs.slug)}`;
+  const stats = (cs.stats ?? []).length
+    ? `<ul class="dialog-stats">${cs.stats.map((x) => `<li><strong>${esc(x.value)}</strong><span>${esc(x.label)}</span></li>`).join("")}</ul>`
+    : "";
+  const panes = [
+    ["problem", "Problem", `<p class="dialog-problem">${esc(cs.problem)}</p>`],
+    ["built", "What I built", list(cs.built)],
+    ["results", "Results", list(cs.results)],
+    ["tech", "Tech", chips(cs.tech)],
+  ];
+  const tabs = panes.map(([key, label], n) =>
+    `<button class="dialog-tab" type="button" role="tab" id="${id}-tab-${key}" aria-controls="${id}-${key}" aria-selected="${n === 0}" tabindex="${n === 0 ? 0 : -1}">${label}</button>`).join("");
+  const panels = panes.map(([key, , body], n) =>
+    `<div class="dialog-pane" role="tabpanel" id="${id}-${key}" aria-labelledby="${id}-tab-${key}"${n === 0 ? "" : " hidden"}>${body}</div>`).join("");
   return `
   <dialog class="project-dialog" id="${id}" aria-labelledby="${id}-title">
     <form method="dialog" class="dialog-close-form"><button class="dialog-close" aria-label="Close">×</button></form>
     <p class="eyebrow">${esc(p.kicker ?? "Project")}</p>
     <h2 id="${id}-title">${esc(p.title)}</h2>
-    <p class="dialog-problem">${esc(cs.problem)}</p>
-    <h3>What I built</h3>
-    ${list(cs.built.slice(0, 4))}
-    <h3>Results</h3>
-    ${list(cs.results)}
-    ${chips(cs.tech)}
+    ${stats}
+    <div class="dialog-tabs" role="tablist" aria-label="${esc(p.title)}">${tabs}</div>
+    ${panels}
     <div class="dialog-actions">
       ${projectLinks(p)}
       <a class="btn magnetic" href="${casePath(p)}">Full case study →</a>

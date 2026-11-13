@@ -379,3 +379,19 @@ test("the name has a say-it line, and its play button stays hidden until app.js 
   bad.pronounce.audio = "https://evil.example/x.mp3";
   assert.ok(validate(bad).some((p) => p.startsWith("pronounce.audio")));
 });
+
+test("project pop-ups lead with big numbers, then tabs with only the first panel showing", () => {
+  const html = render(content);
+  for (const p of content.projects.filter((x) => x.caseStudy)) {
+    const id = `dlg-${p.caseStudy.slug}`;
+    const start = html.indexOf(`<dialog class="project-dialog" id="${id}"`);
+    const dialog = html.slice(start, html.indexOf("</dialog>", start));
+    if (p.caseStudy.stats) assert.equal((dialog.match(/<li><strong>/g) ?? []).length, p.caseStudy.stats.length, p.title);
+    assert.equal((dialog.match(/role="tab"/g) ?? []).length, 4, p.title);
+    assert.ok(dialog.includes(`id="${id}-tab-problem" aria-controls="${id}-problem" aria-selected="true" tabindex="0"`), p.title);
+    assert.equal((dialog.match(/role="tabpanel"[^>]* hidden>/g) ?? []).length, 3, p.title);
+  }
+  const bad = copy();
+  bad.projects[0].caseStudy.stats = [{ value: "1" }];
+  assert.ok(validate(bad).some((m) => m.endsWith("caseStudy.stats must be up to 4 items, each with a value and a label")));
+});

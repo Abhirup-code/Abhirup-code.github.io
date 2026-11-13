@@ -63,6 +63,20 @@
           "Prometheus",
           "Grafana",
           "Playwright"
+        ],
+        "stats": [
+          {
+            "value": "15 min",
+            "label": "reset links expire"
+          },
+          {
+            "value": "90%",
+            "label": "test coverage gate"
+          },
+          {
+            "value": "2",
+            "label": "approvals for admin rights"
+          }
         ]
       }
     },
@@ -97,6 +111,20 @@
           "k6",
           "Python",
           "GitHub Actions"
+        ],
+        "stats": [
+          {
+            "value": "61 s",
+            "label": "from outage to page"
+          },
+          {
+            "value": "99.5%",
+            "label": "availability SLO"
+          },
+          {
+            "value": "59",
+            "label": "Python tests"
+          }
         ]
       }
     },
@@ -130,6 +158,20 @@
           "pytest",
           "ruff",
           "GitHub Actions"
+        ],
+        "stats": [
+          {
+            "value": "16/18",
+            "label": "right section in the top 3"
+          },
+          {
+            "value": "15/15",
+            "label": "guard verdicts right"
+          },
+          {
+            "value": "99%",
+            "label": "test coverage"
+          }
         ]
       }
     },
@@ -164,6 +206,20 @@
           "React Testing Library",
           "GitHub Actions",
           "GitHub Pages"
+        ],
+        "stats": [
+          {
+            "value": "87",
+            "label": "Jest and React tests"
+          },
+          {
+            "value": "0",
+            "label": "WCAG 2.1 AA issues"
+          },
+          {
+            "value": "5 s",
+            "label": "refresh"
+          }
         ]
       }
     },
@@ -194,6 +250,20 @@
           "Hypothesis",
           "GitHub Actions",
           "ruff"
+        ],
+        "stats": [
+          {
+            "value": "129",
+            "label": "tests"
+          },
+          {
+            "value": "2",
+            "label": "real bugs found and fixed"
+          },
+          {
+            "value": "4",
+            "label": "report formats"
+          }
         ]
       }
     },
@@ -225,6 +295,20 @@
           "Hypothesis",
           "Atheris",
           "Docker"
+        ],
+        "stats": [
+          {
+            "value": "~170",
+            "label": "skills it checks"
+          },
+          {
+            "value": "~99%",
+            "label": "test coverage"
+          },
+          {
+            "value": "$0",
+            "label": "API cost, runs locally"
+          }
         ]
       }
     },
@@ -259,6 +343,20 @@
           "axe-core",
           "Lighthouse CI",
           "GitHub Pages"
+        ],
+        "stats": [
+          {
+            "value": "100",
+            "label": "Lighthouse score"
+          },
+          {
+            "value": "347",
+            "label": "unit and component tests"
+          },
+          {
+            "value": "30",
+            "label": "end-to-end tests"
+          }
         ]
       }
     }

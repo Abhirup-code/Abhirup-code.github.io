@@ -130,6 +130,32 @@
     });
   });
 
+  /* ---------- Tabs in the project pop-ups: click, or the arrow keys, Home and End on a tab ---------- */
+  document.querySelectorAll(".dialog-tabs").forEach(function (list) {
+    var tabs = Array.prototype.slice.call(list.querySelectorAll("[role=tab]"));
+    function select(tab) {
+      tabs.forEach(function (t) {
+        var on = t === tab;
+        t.setAttribute("aria-selected", on ? "true" : "false");
+        t.tabIndex = on ? 0 : -1;
+        document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+      });
+    }
+    tabs.forEach(function (tab, n) {
+      tab.addEventListener("click", function () { select(tab); });
+      tab.addEventListener("keydown", function (e) {
+        var to = { ArrowRight: n + 1, ArrowLeft: n - 1, Home: 0, End: tabs.length - 1 }[e.key];
+        if (to === undefined) return;
+        e.preventDefault();
+        var next = tabs[(to + tabs.length) % tabs.length];
+        select(next);
+        next.focus();
+      });
+    });
+    // Each time the pop-up opens, start again on the first tab.
+    list.closest("dialog").addEventListener("close", function () { select(tabs[0]); });
+  });
+
   /* ---------- Copy email in the quick view ---------- */
   document.querySelectorAll(".copy-email").forEach(function (btn) {
     if (!navigator.clipboard) return;
