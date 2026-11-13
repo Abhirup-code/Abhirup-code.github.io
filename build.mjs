@@ -179,8 +179,7 @@ function skillChip(c, item, style) {
   return `<li class="chip-item"><details class="proof"><summary class="chip chip-${esc(style)}">${esc(item)}<span class="proof-count" aria-hidden="true">${proof.length}</span><span class="sr-only">, used in ${proof.length} ${proof.length === 1 ? "place" : "places"}</span></summary><div class="proof-pop"><p>Where I used ${esc(item)}</p><ul>${links}</ul></div></details></li>`;
 }
 
-function projectTile(p, i) {
-  const n = String(i + 1).padStart(2, "0");
+function projectTile(p) {
   const code = p.code
     ? `<a class="tile-code" href="${esc(safeUrl(p.code))}"${linkAttrs(p.code)}>Code</a>`
     : "";
@@ -190,7 +189,7 @@ function projectTile(p, i) {
   return `
       <article class="tile tile-${esc(p.style)}">
         <a class="tile-link" ${target}>
-          <span class="tile-top"><span class="kicker">${n} · ${esc(p.kicker ?? "")}</span><span class="arrow" aria-hidden="true">↗</span></span>
+          <span class="tile-top"><span class="kicker">${esc(p.kicker ?? "")}</span><span class="arrow" aria-hidden="true">↗</span></span>
           <span class="tile-body"><strong class="tile-title">${esc(p.title)}</strong><span class="tile-desc">${esc(p.description)}</span></span>
         </a>${code}
       </article>`;
