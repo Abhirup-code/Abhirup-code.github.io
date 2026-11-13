@@ -342,7 +342,7 @@ export function renderPostmortemIndex(c) {
     title: "Postmortems",
     description: "Blameless write-ups of what broke in my projects, how it was caught, and what changed after.",
     path: "postmortems/",
-    back: "../#postmortems",
+    back: "../",
     backLabel: "Home",
     body: `<main id="main" class="case wrap">
   <p class="eyebrow">Postmortems</p>
@@ -462,21 +462,6 @@ function labSection() {
       <p>A live simulation of a checkout service with real SLOs. Turn up the errors, watch the error budget burn and the alerts fire, then try to ship a feature past the deploy gate.</p>
     </div>
     <a class="btn btn-solid magnetic" href="lab/">Open the lab →</a>
-  </section>
-`;
-}
-
-function postmortemSection(c) {
-  return `
-  <section class="postmortems wrap" id="postmortems" aria-labelledby="pm-heading">
-    <div class="section-head">
-      <span class="eyebrow">Postmortems</span>
-      <h2 id="pm-heading">When things <em>broke.</em></h2>
-      <p>Blameless write-ups of real failures and drills: how they were caught and what changed after.</p>
-      <p><a href="postmortems/">All postmortems →</a></p>
-    </div>
-    <ul class="pm-list">${sortedPostmortems(c).slice(0, 3).map((pm) => pmCard(pm, "postmortems/")).join("")}
-    </ul>
   </section>
 `;
 }
@@ -742,7 +727,7 @@ ${(c.moreProjects ?? []).length ? `  <section class="more wrap" aria-labelledby=
     <ol class="timeline">${c.experience.map(job).join("")}
     </ol>
   </section>
-${c.lab ? labSection() : ""}${(c.postmortems ?? []).length ? postmortemSection(c) : ""}
+${c.lab ? labSection() : ""}
 ${(c.recommendations ?? []).length ? `  <section class="recs wrap" id="recommendations" aria-labelledby="recs-heading">
     <div class="section-head">
       <span class="eyebrow">Recommendations</span>

@@ -320,9 +320,7 @@ test("postmortems get their own pages, newest first, with every part shown", () 
     for (const a of pm.actions) assert.ok(page.includes(`pm-type-${a.type.toLowerCase()}`));
     assert.match(page, /script-src 'self'/);
   }
-  const home = render(content);
-  assert.ok(home.includes('id="postmortems"'));
-  assert.ok(home.includes('href="postmortems/"'));
+  assert.ok(!render(content).includes('id="postmortems"'), "the home page no longer shows postmortems");
 });
 
 test("a postmortem needs every section, a real date, and known action types", () => {
@@ -338,7 +336,7 @@ test("a postmortem needs every section, a real date, and known action types", ()
   assert.ok(problems.includes("postmortems[2] needs title, system, severity, summary, rootCause, and detection"));
   const none = copy();
   delete none.postmortems;
-  assert.ok(!render(none).includes('id="postmortems"'));
+  assert.deepEqual(validate(none), []);
 });
 
 test("the uptime data stays off the page, for the terminal only, and may only be fetched from GitHub", () => {
