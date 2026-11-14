@@ -368,10 +368,11 @@ test("the lab page loads only its own scripts and works as a plain page without 
 
 test("the name has a say-it line, and its play button stays hidden until app.js can speak", () => {
   const html = render(content);
-  assert.match(html, /<p class="say-name">Say it: <strong>Avi-roop<\/strong> <button class="say-btn" type="button" data-say="[^"]+" aria-label="Play how to say my name" hidden>/);
+  assert.match(html, /<p class="say-name">Say it: <strong>Avi-roop<\/strong> <button class="say-btn" type="button" data-say="[^"]+"( data-audio="assets\/name.mp3")? aria-label="Play how to say my name" hidden>/);
   const none = copy();
   delete none.pronounce;
   assert.ok(!render(none).includes("say-name"));
+  assert.ok(html.includes('data-audio="assets/name.mp3"'), "the site plays the recording");
   const rec = copy();
   rec.pronounce.audio = "assets/name.mp3";
   assert.ok(render(rec).includes('data-audio="assets/name.mp3"'));

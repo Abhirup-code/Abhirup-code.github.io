@@ -830,7 +830,7 @@ export function build(outDir = join(ROOT, "_site")) {
   for (const file of ["404.html", "thanks.html", "CNAME", "robots.txt"]) {
     if (existsSync(join(ROOT, file))) copyFileSync(join(ROOT, file), join(outDir, file));
   }
-  for (const link of [content.links.resume, content.photo].filter(Boolean)) {
+  for (const link of [content.links.resume, content.photo, content.pronounce?.audio].filter(Boolean)) {
     if (!isExternal(link) && !existsSync(join(outDir, link))) throw new Error(`Missing file: ${link}`);
   }
   return outDir;

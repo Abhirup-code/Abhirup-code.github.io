@@ -6,7 +6,7 @@
   "pronounce": {
     "text": "Avi-roop",
     "speak": "Avee roop",
-    "audio": null
+    "audio": "assets/name.mp3"
   },
   "description": "Abhirup Khan: IT support, QA, and DevOps. Projects, experience, and resume.",
   "url": "https://abhirupkhan.me/",
