@@ -55,6 +55,7 @@ export function validate(c) {
   need(Array.isArray(c?.experience) && c.experience.length > 0, "experience must be a non-empty list");
   for (const [i, p] of (c?.projects ?? []).entries()) {
     need(text(p.title) && text(p.description) && text(p.url), `projects[${i}] needs title, description, and url`);
+    need(p.demo == null || /^demo\/[a-z0-9-]+\/$/.test(p.demo), `projects[${i}].demo must be a folder in this repo, like "demo/helpdesk/"`);
     need(STYLES.includes(p.style), `projects[${i}].style must be one of ${STYLES.join(", ")}`);
   }
   for (const [i, p] of (c?.projects ?? []).entries()) {
@@ -201,9 +202,11 @@ const list = (items) => `<ul>${items.map((x) => `<li>${esc(x)}</li>`).join("")}<
 const chips = (items) => `<ul class="chips">${items.map((x) => `<li class="chip chip-outline">${esc(x)}</li>`).join("")}</ul>`;
 
 /** Links for a project: the live demo when there is one, and the code. */
-function projectLinks(p) {
+// `base` is the path back to the site root: "" on the home page, "../" on a case study page.
+function projectLinks(p, base = "") {
   const out = [];
-  if (p.code) out.push(`<a class="btn btn-solid magnetic" href="${esc(safeUrl(p.url))}"${linkAttrs(p.url)}>Live demo ↗</a>`);
+  if (p.demo) out.push(`<a class="btn btn-solid magnetic" href="${esc(base + safeUrl(p.demo))}">Live demo →</a>`);
+  else if (p.code) out.push(`<a class="btn btn-solid magnetic" href="${esc(safeUrl(p.url))}"${linkAttrs(p.url)}>Live demo ↗</a>`);
   const code = p.code ?? p.url;
   out.push(`<a class="btn magnetic" href="${esc(safeUrl(code))}"${linkAttrs(code)}>Code on GitHub ↗</a>`);
   return out.join("\n          ");
@@ -296,7 +299,7 @@ export function renderCase(c, p) {
   <p class="eyebrow">Case study · ${esc(p.kicker ?? "")}</p>
   <h1>${esc(p.title)}</h1>
   <p class="case-lede">${esc(p.description)}</p>
-  <div class="case-actions">${projectLinks(p)}</div>
+  <div class="case-actions">${projectLinks(p, "../")}</div>
   <section class="case-section reveal"><h2>The problem</h2><p>${esc(cs.problem)}</p></section>
   <section class="case-section reveal"><h2>What I built</h2>${list(cs.built)}</section>
   <section class="case-section reveal"><h2>Results and quality</h2>${list(cs.results)}</section>
@@ -827,6 +830,11 @@ export function build(outDir = join(ROOT, "_site")) {
     for (const pm of content.postmortems) writeFileSync(join(outDir, pmPath(pm)), renderPostmortem(content, pm));
   }
   cpSync(join(ROOT, "assets"), join(outDir, "assets"), { recursive: true });
+  // Click-through demos are static sites built in each project's own repo and copied here as they are.
+  if (existsSync(join(ROOT, "demo"))) cpSync(join(ROOT, "demo"), join(outDir, "demo"), { recursive: true });
+  for (const p of content.projects.filter((x) => x.demo)) {
+    if (!existsSync(join(outDir, p.demo, "index.html"))) throw new Error(`Missing demo: ${p.demo}index.html`);
+  }
   for (const file of ["404.html", "thanks.html", "CNAME", "robots.txt"]) {
     if (existsSync(join(ROOT, file))) copyFileSync(join(ROOT, file), join(outDir, file));
   }

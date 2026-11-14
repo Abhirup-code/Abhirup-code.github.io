@@ -1,0 +1,83 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demo · Approvals · HelpDesk Autopilot</title>
+  <link rel="stylesheet" href="portal.css">
+  
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="demo.css">
+  <script src="demo.js" defer></script>
+</head>
+<body>
+  <aside class="demo-bar" aria-label="Demo guide">
+    <p class="demo-chapter"><span class="demo-tag">Demo</span>Access with approval · saved screens from the real app, nothing here is sent anywhere</p>
+    <p class="demo-caption">Liam signs in and finds the request waiting for him. Nobody can approve their own request.</p>
+    <nav class="demo-nav" aria-label="Demo steps">
+      <span class="demo-count">10 / 13</span>
+      <a class="demo-back" href="09.html">Back</a>
+      <a class="demo-next" href="11.html">Next</a>
+      
+      <a href="../../">Exit</a>
+    </nav>
+    <progress class="demo-progress" value="10" max="13">Step 10 of 13</progress>
+  </aside>
+  <p class="demo-hint" role="status" hidden>This is a demo. Click the highlighted button, or Next.</p>
+  <header class="topbar">
+    <a class="brand" href="#">HelpDesk <span>Autopilot</span></a>
+    
+    <nav aria-label="Main">
+      
+      <a href="#">Tickets</a>
+      
+      <a href="#">New request</a>
+      
+      <a href="#" aria-current="page">Approvals</a>
+      
+      <a href="#">Inbox</a>
+      
+      
+    </nav>
+    <div class="who">
+      <span class="chip">Liam Chen · manager</span>
+      <form>
+        
+        <button class="link" type="submit">Sign out</button>
+      </form>
+    </div>
+    
+  </header>
+  <main>
+    
+    
+<h1>Waiting for you</h1>
+
+
+<section class="card approval">
+  <div class="heading">
+    <h2><a href="#">#2</a> Emma Ruiz wants <code>tableau-users</code></h2>
+    <span class="pill s-waiting_approval">Waiting for manager</span>
+  </div>
+  <p>For the month-end reports</p>
+  
+  <div class="actions">
+    <form>
+      
+      
+      <button type="submit" data-demo-hot="">Approve</button>
+    </form>
+    <form class="inline">
+      
+      
+      <label class="sr-only" for="reason-2">Reason</label>
+      <input id="reason-2" placeholder="Reason for rejecting" required="" value="" readonly="">
+      <button type="submit" class="secondary">Reject</button>
+    </form>
+  </div>
+</section>
+
+
+
+  </main>
+
+</body></html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demo · Audit log · HelpDesk Autopilot</title>
+  <link rel="stylesheet" href="portal.css">
+  
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="demo.css">
+  <script src="demo.js" defer></script>
+</head>
+<body>
+  <aside class="demo-bar" aria-label="Demo guide">
+    <p class="demo-chapter"><span class="demo-tag">Demo</span>The IT view · saved screens from the real app, nothing here is sent anywhere</p>
+    <p class="demo-caption">Every change is in the audit log: who, what, when, and for which ticket. The database itself refuses to edit or delete these records.</p>
+    <nav class="demo-nav" aria-label="Demo steps">
+      <span class="demo-count">13 / 13</span>
+      <a class="demo-back" href="12.html">Back</a>
+      <a class="demo-next" href="https://github.com/Abhirup-code/HelpDesk_Autopilot">See the code</a>
+      <a href="index.html">Start over</a>
+      <a href="../../">Exit</a>
+    </nav>
+    <progress class="demo-progress" value="13" max="13">Step 13 of 13</progress>
+  </aside>
+  <p class="demo-hint" role="status" hidden>This is a demo. Click the highlighted button, or Next.</p>
+  <header class="topbar">
+    <a class="brand" href="#">HelpDesk <span>Autopilot</span></a>
+    
+    <nav aria-label="Main">
+      
+      <a href="#">Tickets</a>
+      
+      <a href="#">New request</a>
+      
+      <a href="#">Approvals</a>
+      
+      <a href="#">Inbox</a>
+      
+      <a href="#" aria-current="page">Audit log</a>
+      
+      <a href="#" rel="noopener">Dashboard ↗</a>
+    </nav>
+    <div class="who">
+      <span class="chip">Ava Patel · agent</span>
+      <form>
+        
+        <button class="link" type="submit">Sign out</button>
+      </form>
+    </div>
+    
+  </header>
+  <main>
+    
+    
+<h1>Audit log</h1>
+<p class="muted">Every directory change and approval. Entries can't be edited or deleted.</p>
+<form class="inline">
+  <label>Action <input value="" placeholder="e.g. group.add" readonly=""></label>
+  <label>User <input value="" placeholder="e.g. emma" readonly=""></label>
+  <button type="submit" class="secondary">Filter</button>
+</form>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>When</th><th>Who</th><th>Action</th><th>User</th><th>Ticket</th><th>Detail</th></tr></thead>
+  <tbody>
+  
+  <tr>
+    <td>Nov 14, 19:10 UTC</td><td>autopilot</td><td><code>group.add</code></td><td>emma</td>
+    <td><a href="#">#2</a></td><td>tableau-users</td>
+  </tr>
+  
+  <tr>
+    <td>Nov 14, 19:10 UTC</td><td>liam</td><td><code>approval.manager</code></td><td>emma</td>
+    <td><a href="#">#2</a></td><td>tableau-users</td>
+  </tr>
+  
+  <tr>
+    <td>Nov 14, 19:10 UTC</td><td>emma</td><td><code>password.set</code></td><td>emma</td>
+    <td><a href="#">#1</a></td><td>via one-time link</td>
+  </tr>
+  
+  <tr>
+    <td>Nov 14, 19:10 UTC</td><td>autopilot</td><td><code>password_link.issue</code></td><td>emma</td>
+    <td><a href="#">#1</a></td><td>valid for 15 minutes</td>
+  </tr>
+  
+  </tbody>
+</table>
+</div>
+
+  </main>
+
+</body></html>

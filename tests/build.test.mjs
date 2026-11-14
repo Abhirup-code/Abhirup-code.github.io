@@ -396,3 +396,14 @@ test("project pop-ups lead with big numbers, then tabs with only the first panel
   bad.projects[0].caseStudy.stats = [{ value: "1" }];
   assert.ok(validate(bad).some((m) => m.endsWith("caseStudy.stats must be up to 4 items, each with a value and a label")));
 });
+
+test("a project with a click-through demo gets a Live demo button that works from both pages", () => {
+  const p = content.projects.find((x) => x.demo);
+  assert.ok(p, "at least one project has a demo");
+  const home = render(content);
+  assert.ok(home.includes(`href="${p.demo}">Live demo →</a>`));
+  assert.ok(renderCase(content, p).includes(`href="../${p.demo}">Live demo →</a>`));
+  const bad = copy();
+  bad.projects[0].demo = "https://evil.example/";
+  assert.ok(validate(bad).some((m) => m.includes(".demo must be a folder in this repo")));
+});

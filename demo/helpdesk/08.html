@@ -1,0 +1,102 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demo · New request · HelpDesk Autopilot</title>
+  <link rel="stylesheet" href="portal.css">
+  
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="demo.css">
+  <script src="demo.js" defer></script>
+</head>
+<body>
+  <aside class="demo-bar" aria-label="Demo guide">
+    <p class="demo-chapter"><span class="demo-tag">Demo</span>Access with approval · saved screens from the real app, nothing here is sent anywhere</p>
+    <p class="demo-caption">Next, Emma asks for access to Tableau. Access always needs a manager&#x27;s yes.</p>
+    <nav class="demo-nav" aria-label="Demo steps">
+      <span class="demo-count">8 / 13</span>
+      <a class="demo-back" href="07.html">Back</a>
+      <a class="demo-next" href="09.html">Next</a>
+      
+      <a href="../../">Exit</a>
+    </nav>
+    <progress class="demo-progress" value="8" max="13">Step 8 of 13</progress>
+  </aside>
+  <p class="demo-hint" role="status" hidden>This is a demo. Click the highlighted button, or Next.</p>
+  <header class="topbar">
+    <a class="brand" href="#">HelpDesk <span>Autopilot</span></a>
+    
+    <nav aria-label="Main">
+      
+      <a href="#">Tickets</a>
+      
+      <a href="#" aria-current="page">New request</a>
+      
+      <a href="#">Inbox</a>
+      
+      
+    </nav>
+    <div class="who">
+      <span class="chip">Emma Ruiz · employee</span>
+      <form>
+        
+        <button class="link" type="submit">Sign out</button>
+      </form>
+    </div>
+    
+  </header>
+  <main>
+    
+    
+<section class="card">
+  <h1>New request</h1>
+  
+  <form class="stack" id="new-ticket">
+    
+    <label>What do you need?
+      <select name="type" id="type" required="">
+        <option value="password_reset">Password reset</option><option value="access_request" selected="">Access request</option><option value="hardware">Hardware or other</option>
+      </select>
+    </label>
+    <label>Title <input required="" minlength="3" maxlength="200" value="Need Tableau" readonly=""></label>
+    <label>Description <textarea required="" rows="3" maxlength="5000" readonly="">For the month-end reports</textarea></label>
+
+    <fieldset data-for="access_request">
+      <legend>Access</legend>
+      <label>Group
+        <select name="group" required=""><option>erp-users</option><option>finance-share</option><option>git-users</option><option>helpdesk-agents</option><option>it-admins</option><option selected="">tableau-users</option><option>vpn-users</option></select>
+      </label>
+      <p class="hint">Your manager approves this. <strong>it-admins</strong> also needs IT.</p>
+    </fieldset>
+
+    <fieldset data-for="new_hire" hidden="">
+      <legend>New hire</legend>
+      <div class="row">
+        <label>First name <input value="" readonly=""></label>
+        <label>Last name <input value="" readonly=""></label>
+      </div>
+      <div class="row">
+        <label>Department
+          <select name="department"><option selected="">Engineering</option><option>Finance</option><option>IT</option><option>Operations</option><option>Sales</option></select>
+        </label>
+        <label>Start date <input type="date" value="" min="2026-11-14" readonly=""></label>
+      </div>
+      <p class="hint">The account and department groups are created right away.</p>
+    </fieldset>
+
+    <fieldset data-for="offboarding" hidden="">
+      <legend>Offboarding</legend>
+      <div class="row">
+        <label>Username <input value="" readonly=""></label>
+        <label>Last day <input type="date" value="" readonly=""></label>
+      </div>
+      <p class="hint">Access is removed when the last day ends.</p>
+    </fieldset>
+
+    <button type="submit" data-demo-hot="">Submit request</button>
+  </form>
+</section>
+
+  </main>
+
+</body></html>

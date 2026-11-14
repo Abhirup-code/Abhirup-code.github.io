@@ -36,6 +36,7 @@
       "kicker": "IT automation",
       "description": "Automates onboarding, offboarding, and password resets with approvals and an audit log.",
       "url": "https://github.com/Abhirup-code/HelpDesk_Autopilot",
+      "demo": "demo/helpdesk/",
       "style": "feature",
       "caseStudy": {
         "slug": "helpdesk-autopilot",
